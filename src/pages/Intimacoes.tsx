@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Eye, ExternalLink } from "lucide-react";
+import { Search, Eye, ExternalLink, RefreshCw, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
@@ -18,6 +18,7 @@ export default function Intimacoes() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selected, setSelected] = useState<any>(null);
+  const [syncing, setSyncing] = useState(false);
 
   const loadData = async () => {
     let query = supabase.from("intimacoes").select("*").order("data_disponibilizacao", { ascending: false });
@@ -47,11 +48,30 @@ export default function Intimacoes() {
     return <Badge variant="outline" className={s.cls}>{s.label}</Badge>;
   };
 
+  const syncIntimacoes = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-intimacoes");
+      if (error) throw error;
+      toast({ title: "Sincronização concluída", description: data?.message ?? "Intimações sincronizadas" });
+      loadData();
+    } catch (err: any) {
+      toast({ title: "Erro na sincronização", description: err?.message ?? "Erro desconhecido", variant: "destructive" });
+    }
+    setSyncing(false);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Intimações</h1>
-        <p className="text-muted-foreground">Comunicações do PJE</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Intimações</h1>
+          <p className="text-muted-foreground">Comunicações do PJE</p>
+        </div>
+        <Button variant="outline" onClick={syncIntimacoes} disabled={syncing}>
+          {syncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          Sincronizar ComunicaPJE
+        </Button>
       </div>
 
       <Card>

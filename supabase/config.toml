@@ -1,1 +1,7 @@
 project_id = "duqqnwmbbkaqewtvirmo"
+
+[functions.sync-processos]
+verify_jwt = false
+
+[functions.sync-intimacoes]
+verify_jwt = false
