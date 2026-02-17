@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -7,6 +8,7 @@ import {
   CheckSquare,
   LogOut,
   Scale,
+  Settings,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +25,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { ApiConfigModal } from "@/components/ApiConfigModal";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -35,6 +38,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const { signOut, user } = useAuth();
+  const [configOpen, setConfigOpen] = useState(false);
 
   return (
     <Sidebar className="border-r-0">
@@ -83,6 +87,15 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setConfigOpen(true)}
+            className="w-full justify-start gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            <Settings className="h-4 w-4" />
+            Configurações API
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={signOut}
             className="w-full justify-start gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
           >
@@ -90,6 +103,7 @@ export function AppSidebar() {
             Sair
           </Button>
         </div>
+        <ApiConfigModal open={configOpen} onOpenChange={setConfigOpen} />
       </SidebarFooter>
     </Sidebar>
   );

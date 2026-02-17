@@ -5,17 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, RefreshCw, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+
+const TRIBUNAIS_ALIAS: Record<string, string> = {
+  TJAC: "tjac", TJAL: "tjal", TJAM: "tjam", TJAP: "tjap", TJBA: "tjba", TJCE: "tjce",
+  TJDFT: "tjdft", TJES: "tjes", TJGO: "tjgo", TJMA: "tjma", TJMG: "tjmg", TJMS: "tjms",
+  TJMT: "tjmt", TJPA: "tjpa", TJPB: "tjpb", TJPE: "tjpe", TJPI: "tjpi", TJPR: "tjpr",
+  TJRJ: "tjrj", TJRN: "tjrn", TJRO: "tjro", TJRR: "tjrr", TJRS: "tjrs", TJSC: "tjsc",
+  TJSE: "tjse", TJSP: "tjsp", TJTO: "tjto", TRF1: "trf1", TRF2: "trf2", TRF3: "trf3",
+  TRF4: "trf4", TRF5: "trf5", TRF6: "trf6", TST: "tst", STJ: "stj", STF: "stf",
+};
 
 export default function Processos() {
   const [processos, setProcessos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncDialogOpen, setSyncDialogOpen] = useState(false);
+  const [syncNumero, setSyncNumero] = useState("");
+  const [syncTribunal, setSyncTribunal] = useState("");
   const [form, setForm] = useState({ numero_cnj: "", tribunal: "", orgao_julgador: "", assunto: "", status: "em_andamento", grau: "" });
 
   const loadProcessos = async () => {
@@ -57,6 +70,28 @@ export default function Processos() {
     return cnj;
   };
 
+  const syncProcesso = async () => {
+    if (!syncNumero || !syncTribunal) {
+      toast({ title: "Erro", description: "Informe o número CNJ e o tribunal", variant: "destructive" });
+      return;
+    }
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-processos", {
+        body: { numero_cnj: syncNumero, tribunal_alias: TRIBUNAIS_ALIAS[syncTribunal] ?? syncTribunal.toLowerCase() },
+      });
+      if (error) throw error;
+      toast({ title: "Sincronização concluída", description: data?.message ?? "Processo sincronizado" });
+      setSyncDialogOpen(false);
+      setSyncNumero("");
+      setSyncTribunal("");
+      loadProcessos();
+    } catch (err: any) {
+      toast({ title: "Erro na sincronização", description: err?.message ?? "Erro desconhecido", variant: "destructive" });
+    }
+    setSyncing(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -64,10 +99,40 @@ export default function Processos() {
           <h1 className="text-2xl font-bold tracking-tight">Processos</h1>
           <p className="text-muted-foreground">Gestão de processos judiciais</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />Novo Processo</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Dialog open={syncDialogOpen} onOpenChange={setSyncDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4" />Sincronizar Datajud</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Sincronizar Processo via Datajud</DialogTitle></DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Número CNJ</Label>
+                  <Input value={syncNumero} onChange={(e) => setSyncNumero(e.target.value)} placeholder="00000000020238130000" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tribunal</Label>
+                  <Select value={syncTribunal} onValueChange={setSyncTribunal}>
+                    <SelectTrigger><SelectValue placeholder="Selecione o tribunal" /></SelectTrigger>
+                    <SelectContent>
+                      {Object.keys(TRIBUNAIS_ALIAS).map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={syncProcesso} disabled={syncing} className="w-full">
+                  {syncing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Buscar e Sincronizar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="mr-2 h-4 w-4" />Novo Processo</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Cadastrar Processo</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
@@ -109,6 +174,7 @@ export default function Processos() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Card>
