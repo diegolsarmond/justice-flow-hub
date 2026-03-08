@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      area_atuacao: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          idempresa: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome?: string
+        }
+        Relationships: []
+      }
+      categorias: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           ativo: boolean
@@ -168,6 +234,93 @@ export type Database = {
           },
         ]
       }
+      escritorios: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          empresa: number
+          id: number
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          empresa: number
+          id?: number
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          empresa?: number
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      etiquetas: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          exibe_pipeline: boolean
+          id: number
+          id_fluxo_trabalho: number
+          idempresa: number | null
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          exibe_pipeline?: boolean
+          id?: number
+          id_fluxo_trabalho: number
+          idempresa?: number | null
+          nome: string
+          ordem: number
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          exibe_pipeline?: boolean
+          id?: number
+          id_fluxo_trabalho?: number
+          idempresa?: number | null
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
+      fluxo_trabalho: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          exibe_menu: boolean
+          id: number
+          idempresa: number | null
+          nome: string
+          ordem: number | null
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          exibe_menu?: boolean
+          id?: number
+          idempresa?: number | null
+          nome: string
+          ordem?: number | null
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          exibe_menu?: boolean
+          id?: number
+          idempresa?: number | null
+          nome?: string
+          ordem?: number | null
+        }
+        Relationships: []
+      }
       perfil_modulos: {
         Row: {
           modulo: string
@@ -321,6 +474,210 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sistema_cnj: {
+        Row: {
+          id: number
+          nome: string
+        }
+        Insert: {
+          id?: number
+          nome: string
+        }
+        Update: {
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      situacao_cliente: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          nome?: string
+        }
+        Relationships: []
+      }
+      situacao_processo: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          idempresa: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome?: string
+        }
+        Relationships: []
+      }
+      situacao_proposta: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          idempresa: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          example: string | null
+          group_name: string | null
+          id: number
+          key: string
+          label: string
+        }
+        Insert: {
+          example?: string | null
+          group_name?: string | null
+          id?: number
+          key: string
+          label: string
+        }
+        Update: {
+          example?: string | null
+          group_name?: string | null
+          id?: number
+          key?: string
+          label?: string
+        }
+        Relationships: []
+      }
+      tipo_documento: {
+        Row: {
+          ativo: boolean | null
+          datacriacao: string | null
+          id: number
+          idempresa: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          datacriacao?: string | null
+          id?: number
+          idempresa?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          datacriacao?: string | null
+          id?: number
+          idempresa?: number | null
+          nome?: string
+        }
+        Relationships: []
+      }
+      tipo_envolvimento: {
+        Row: {
+          descricao: string
+          id: number
+        }
+        Insert: {
+          descricao: string
+          id?: number
+        }
+        Update: {
+          descricao?: string
+          id?: number
+        }
+        Relationships: []
+      }
+      tipo_evento: {
+        Row: {
+          agenda: boolean
+          ativo: boolean
+          datacriacao: string
+          id: number
+          idempresa: number | null
+          nome: string
+          tarefa: boolean
+        }
+        Insert: {
+          agenda?: boolean
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome: string
+          tarefa?: boolean
+        }
+        Update: {
+          agenda?: boolean
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          nome?: string
+          tarefa?: boolean
+        }
+        Relationships: []
+      }
+      tipo_processo: {
+        Row: {
+          ativo: boolean
+          datacriacao: string
+          id: number
+          idareaatuacao: number | null
+          idempresa: number | null
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idareaatuacao?: number | null
+          idempresa?: number | null
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          datacriacao?: string
+          id?: number
+          idareaatuacao?: number | null
+          idempresa?: number | null
+          nome?: string
         }
         Relationships: []
       }
