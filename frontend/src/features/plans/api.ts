@@ -121,17 +121,17 @@ export const formatPlanPriceLabel = (plan: PlanOption): string => {
 };
 
 export async function fetchPlanOptions(signal?: AbortSignal): Promise<PlanOption[]> {
-  const response = await fetch(getApiUrl("planos"), {
-    headers: { Accept: "application/json" },
-    signal,
-  });
+  const { data, error } = await supabase
+    .from("planos")
+    .select("*")
+    .eq("ativo", true)
+    .abortSignal(signal as any);
 
-  if (!response.ok) {
-    throw new Error(`Falha ao carregar planos (HTTP ${response.status})`);
+  if (error) {
+    throw new Error(`Falha ao carregar planos: ${error.message}`);
   }
 
-  const payload = await response.json();
-  return parsePlanOptions(payload);
+  return parsePlanOptions(data);
 }
 
 export const getComparableMonthlyPrice = (plan: PlanOption): number | null => {
