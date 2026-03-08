@@ -11,8 +11,12 @@ import { Scale, Eye, EyeOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function Auth() {
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const saved = JSON.parse(localStorage.getItem("crm_saved_login") || "null");
+  const [loginEmail, setLoginEmail] = useState(saved?.email || "");
+  const [loginPassword, setLoginPassword] = useState(saved?.password || "");
+  const [rememberMe, setRememberMe] = useState(!!saved);
+  const [showLoginPass, setShowLoginPass] = useState(false);
+  const [showSignupPass, setShowSignupPass] = useState(false);
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupNome, setSignupNome] = useState("");
