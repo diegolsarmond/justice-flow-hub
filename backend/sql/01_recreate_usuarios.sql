@@ -3,7 +3,7 @@
 
 DROP TABLE IF EXISTS public.usuarios CASCADE;
 
-CREATE TABLE IF NOT EXISTS public.usuarios (
+create table public.usuarios (
   id serial not null,
   nome_completo text not null,
   cpf character varying null,

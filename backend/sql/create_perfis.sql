@@ -1,5 +1,5 @@
 -- Create perfis table
-CREATE TABLE IF NOT EXISTS public.perfis (
+create table public.perfis (
   id serial not null,
   nome text not null,
   ativo boolean not null default true,

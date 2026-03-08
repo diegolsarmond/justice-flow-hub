@@ -4,7 +4,7 @@
 create schema if not exists governance;
 create schema if not exists cold_archive;
 
-CREATE TABLE IF NOT EXISTS governance.legacy_cleanup_audit (
+create table if not exists governance.legacy_cleanup_audit (
   id bigserial primary key,
   snapshot_label text not null,
   table_name text not null,
@@ -128,7 +128,7 @@ begin
     v_snapshot_table := format('%I_%s', v_table, p_snapshot_label);
 
     execute format(
-      'CREATE TABLE IF NOT EXISTS cold_archive.%I as table public.%I',
+      'create table if not exists cold_archive.%I as table public.%I',
       v_snapshot_table,
       v_table
     );
@@ -176,7 +176,7 @@ drop event trigger if exists trg_prevent_public_backup_tables;
 
 create event trigger trg_prevent_public_backup_tables
 on ddl_command_end
-when tag in ('CREATE TABLE IF NOT EXISTS', 'CREATE TABLE IF NOT EXISTS AS', 'SELECT INTO')
+when tag in ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
 execute function governance.prevent_public_backup_tables();
 
 comment on function governance.prevent_public_backup_tables() is

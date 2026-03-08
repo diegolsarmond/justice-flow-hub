@@ -2,7 +2,7 @@
 -- Nota de migração: em migrações Postgres -> Supabase, erros comuns vieram de incompatibilidades
 -- de tipos/DDL legados. Esta estrutura isola a sincronização em tabelas dedicadas.
 
-CREATE TABLE IF NOT EXISTS public.pje_processos (
+create table if not exists public.pje_processos (
   id bigserial primary key,
   idempresa integer not null,
   idusuario integer not null,
@@ -36,7 +36,7 @@ create index if not exists idx_pje_processos_numero
 create index if not exists idx_pje_processos_ultimo_mov
   on public.pje_processos (ultimo_movimento_data desc);
 
-CREATE TABLE IF NOT EXISTS public.pje_processo_partes (
+create table if not exists public.pje_processo_partes (
   id bigserial primary key,
   processo_id bigint not null references public.pje_processos(id) on delete cascade,
   numero_processo text not null,
@@ -57,7 +57,7 @@ create index if not exists idx_pje_processo_partes_processo
 create index if not exists idx_pje_processo_partes_numero
   on public.pje_processo_partes (numero_processo);
 
-CREATE TABLE IF NOT EXISTS public.pje_processo_movimentos (
+create table if not exists public.pje_processo_movimentos (
   id bigserial primary key,
   processo_id bigint not null references public.pje_processos(id) on delete cascade,
   numero_processo text not null,
@@ -72,7 +72,7 @@ create index if not exists idx_pje_processo_movimentos_processo
 create index if not exists idx_pje_processo_movimentos_data
   on public.pje_processo_movimentos (data_hora desc);
 
-CREATE TABLE IF NOT EXISTS public.pje_processo_documentos (
+create table if not exists public.pje_processo_documentos (
   id bigserial primary key,
   processo_id bigint not null references public.pje_processos(id) on delete cascade,
   numero_processo text not null,
@@ -95,7 +95,7 @@ create index if not exists idx_pje_processo_documentos_processo
 create index if not exists idx_pje_processo_documentos_sequencia
   on public.pje_processo_documentos (numero_processo, sequencia desc);
 
-CREATE TABLE IF NOT EXISTS public.pje_sync_processos_log (
+create table if not exists public.pje_sync_processos_log (
   id bigserial primary key,
   idempresa integer not null,
   idusuario integer not null,

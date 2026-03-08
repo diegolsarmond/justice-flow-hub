@@ -19,7 +19,7 @@ create extension if not exists pgcrypto;
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
-CREATE TABLE IF NOT EXISTS public.sync_intimacoes_log (
+create table if not exists public.sync_intimacoes_log (
   id bigserial primary key,
   execution_id uuid not null default gen_random_uuid(),
   started_at timestamptz not null default now(),

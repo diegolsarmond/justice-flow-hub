@@ -1,5 +1,4 @@
 import { getApiUrl } from "@/lib/api";
-import { supabase } from "@/integrations/supabase/client";
 
 export type PlanOption = {
   id: number;
@@ -121,17 +120,22 @@ export const formatPlanPriceLabel = (plan: PlanOption): string => {
 };
 
 export async function fetchPlanOptions(signal?: AbortSignal): Promise<PlanOption[]> {
-  const { data, error } = await supabase
-    .from("planos")
-    .select("*")
-    .eq("ativo", true)
-    .abortSignal(signal as any);
+  const response = await fetch(getApiUrl("planos"), {
+    headers: { Accept: "application/json" },
+    signal,
+  });
 
-  if (error) {
-    throw new Error(`Falha ao carregar planos: ${error.message}`);
+  if (!response.ok) {
+    throw new Error(`Falha ao carregar planos (HTTP ${response.status})`);
   }
 
-  return parsePlanOptions(data);
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("Resposta do servidor não é JSON. Verifique a URL do backend.");
+  }
+
+  const payload = await response.json();
+  return parsePlanOptions(payload);
 }
 
 export const getComparableMonthlyPrice = (plan: PlanOption): number | null => {
