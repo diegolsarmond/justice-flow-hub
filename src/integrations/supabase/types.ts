@@ -140,6 +140,169 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_conversations: {
+        Row: {
+          client_id: number | null
+          client_name: string | null
+          contact_avatar: string | null
+          contact_identifier: string
+          contact_name: string | null
+          created_at: string
+          credential_id: string | null
+          custom_attributes: Json | null
+          description: string | null
+          id: string
+          internal_notes: Json | null
+          is_linked_to_client: boolean
+          is_private: boolean
+          last_message_id: string | null
+          last_message_preview: string | null
+          last_message_sender: string | null
+          last_message_status: string | null
+          last_message_timestamp: string | null
+          last_message_type: string | null
+          metadata: Json | null
+          phone_number: string | null
+          pinned: boolean
+          responsible_id: number | null
+          responsible_snapshot: Json | null
+          short_status: string | null
+          tags: Json | null
+          unread_count: number
+          updated_at: string
+          wa_chat_id: string | null
+        }
+        Insert: {
+          client_id?: number | null
+          client_name?: string | null
+          contact_avatar?: string | null
+          contact_identifier: string
+          contact_name?: string | null
+          created_at?: string
+          credential_id?: string | null
+          custom_attributes?: Json | null
+          description?: string | null
+          id: string
+          internal_notes?: Json | null
+          is_linked_to_client?: boolean
+          is_private?: boolean
+          last_message_id?: string | null
+          last_message_preview?: string | null
+          last_message_sender?: string | null
+          last_message_status?: string | null
+          last_message_timestamp?: string | null
+          last_message_type?: string | null
+          metadata?: Json | null
+          phone_number?: string | null
+          pinned?: boolean
+          responsible_id?: number | null
+          responsible_snapshot?: Json | null
+          short_status?: string | null
+          tags?: Json | null
+          unread_count?: number
+          updated_at?: string
+          wa_chat_id?: string | null
+        }
+        Update: {
+          client_id?: number | null
+          client_name?: string | null
+          contact_avatar?: string | null
+          contact_identifier?: string
+          contact_name?: string | null
+          created_at?: string
+          credential_id?: string | null
+          custom_attributes?: Json | null
+          description?: string | null
+          id?: string
+          internal_notes?: Json | null
+          is_linked_to_client?: boolean
+          is_private?: boolean
+          last_message_id?: string | null
+          last_message_preview?: string | null
+          last_message_sender?: string | null
+          last_message_status?: string | null
+          last_message_timestamp?: string | null
+          last_message_type?: string | null
+          metadata?: Json | null
+          phone_number?: string | null
+          pinned?: boolean
+          responsible_id?: number | null
+          responsible_snapshot?: Json | null
+          short_status?: string | null
+          tags?: Json | null
+          unread_count?: number
+          updated_at?: string
+          wa_chat_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          attachments: Json | null
+          client_message_id: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          external_id: string | null
+          id: string
+          message_type: string
+          reaction: string | null
+          sender: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          attachments?: Json | null
+          client_message_id?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          external_id?: string | null
+          id: string
+          message_type: string
+          reaction?: string | null
+          sender: string
+          status: string
+          timestamp: string
+        }
+        Update: {
+          attachments?: Json | null
+          client_message_id?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          external_id?: string | null
+          id?: string
+          message_type?: string
+          reaction?: string | null
+          sender?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cliente_atributos: {
         Row: {
           datacadastro: string
@@ -596,6 +759,96 @@ export type Database = {
           },
         ]
       }
+      labels: {
+        Row: {
+          color: string
+          company_id: number | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          company_id?: number | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          company_id?: number | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          preferences: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          preferences: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          preferences?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          category: string
+          created_at: string
+          id: number
+          message: string
+          metadata: Json | null
+          read: boolean
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          category: string
+          created_at?: string
+          id?: number
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          category?: string
+          created_at?: string
+          id?: number
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       oab_monitoradas: {
         Row: {
           created_at: string
@@ -890,6 +1143,24 @@ export type Database = {
           valor_entrada?: number | null
           valor_honorarios?: number | null
           vara_ou_orgao?: string | null
+        }
+        Relationships: []
+      }
+      ops_uaz_sse_tokens: {
+        Row: {
+          credential_id: string
+          sse_base_url: string | null
+          sse_token: string
+        }
+        Insert: {
+          credential_id: string
+          sse_base_url?: string | null
+          sse_token: string
+        }
+        Update: {
+          credential_id?: string
+          sse_base_url?: string | null
+          sse_token?: string
         }
         Relationships: []
       }
@@ -1297,6 +1568,39 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_answers: {
+        Row: {
+          created_at: string
+          empresa_id: number
+          id: number
+          media_type: string | null
+          media_url: string | null
+          message: string
+          shortcut: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          empresa_id: number
+          id?: number
+          media_type?: string | null
+          media_url?: string | null
+          message: string
+          shortcut: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          empresa_id?: number
+          id?: number
+          media_type?: string | null
+          media_url?: string | null
+          message?: string
+          shortcut?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sistema_cnj: {
         Row: {
           id: number
@@ -1611,6 +1915,279 @@ export type Database = {
           nome?: string
         }
         Relationships: []
+      }
+      uaz_credentials: {
+        Row: {
+          connected: boolean
+          created_at: string
+          empresa_id: number | null
+          id: string
+          pair_code: string | null
+          phone_number: string | null
+          profile_name: string | null
+          qr_code: string | null
+          sse_base_url: string | null
+          sse_token: string | null
+          status: string | null
+          subdomain: string
+          token: string
+          updated_at: string
+          webhook_id: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          connected?: boolean
+          created_at?: string
+          empresa_id?: number | null
+          id: string
+          pair_code?: string | null
+          phone_number?: string | null
+          profile_name?: string | null
+          qr_code?: string | null
+          sse_base_url?: string | null
+          sse_token?: string | null
+          status?: string | null
+          subdomain: string
+          token: string
+          updated_at?: string
+          webhook_id?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          connected?: boolean
+          created_at?: string
+          empresa_id?: number | null
+          id?: string
+          pair_code?: string | null
+          phone_number?: string | null
+          profile_name?: string | null
+          qr_code?: string | null
+          sse_base_url?: string | null
+          sse_token?: string | null
+          status?: string | null
+          subdomain?: string
+          token?: string
+          updated_at?: string
+          webhook_id?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      uazapi_conversations: {
+        Row: {
+          assigned_to: string | null
+          contact_display_name: string | null
+          contact_image: string | null
+          contact_name: string | null
+          contact_phone: string
+          created_at: string
+          desativar_bot: boolean
+          id: string
+          instance_id: string
+          is_group: boolean | null
+          last_message_at: string | null
+          last_message_text: string | null
+          notes: string | null
+          status: string | null
+          tags: string | null
+          unread_count: number | null
+          updated_at: string
+          wa_chat_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          contact_display_name?: string | null
+          contact_image?: string | null
+          contact_name?: string | null
+          contact_phone: string
+          created_at?: string
+          desativar_bot?: boolean
+          id?: string
+          instance_id: string
+          is_group?: boolean | null
+          last_message_at?: string | null
+          last_message_text?: string | null
+          notes?: string | null
+          status?: string | null
+          tags?: string | null
+          unread_count?: number | null
+          updated_at?: string
+          wa_chat_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          contact_display_name?: string | null
+          contact_image?: string | null
+          contact_name?: string | null
+          contact_phone?: string
+          created_at?: string
+          desativar_bot?: boolean
+          id?: string
+          instance_id?: string
+          is_group?: boolean | null
+          last_message_at?: string | null
+          last_message_text?: string | null
+          notes?: string | null
+          status?: string | null
+          tags?: string | null
+          unread_count?: number | null
+          updated_at?: string
+          wa_chat_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uazapi_conversations_instance_id_fkey"
+            columns: ["instance_id"]
+            isOneToOne: false
+            referencedRelation: "uazapi_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uazapi_instances: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_business: boolean | null
+          name: string
+          phone_number: string | null
+          profile_name: string | null
+          profile_pic_url: string | null
+          qr_code: string | null
+          status: string | null
+          uazapi_instance_id: string | null
+          uazapi_token: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_business?: boolean | null
+          name: string
+          phone_number?: string | null
+          profile_name?: string | null
+          profile_pic_url?: string | null
+          qr_code?: string | null
+          status?: string | null
+          uazapi_instance_id?: string | null
+          uazapi_token?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_business?: boolean | null
+          name?: string
+          phone_number?: string | null
+          profile_name?: string | null
+          profile_pic_url?: string | null
+          qr_code?: string | null
+          status?: string | null
+          uazapi_instance_id?: string | null
+          uazapi_token?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      uazapi_message_attachments: {
+        Row: {
+          chat_id: string | null
+          created_at: string
+          filename: string | null
+          id: string
+          media_base64: string | null
+          media_type: string | null
+          media_url: string | null
+          message_id: string
+        }
+        Insert: {
+          chat_id?: string | null
+          created_at?: string
+          filename?: string | null
+          id?: string
+          media_base64?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          message_id: string
+        }
+        Update: {
+          chat_id?: string | null
+          created_at?: string
+          filename?: string | null
+          id?: string
+          media_base64?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uazapi_message_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "uazapi_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uazapi_messages: {
+        Row: {
+          content: string | null
+          conversation_id: string
+          created_at: string
+          edited_at: string | null
+          from_me: boolean | null
+          id: string
+          is_private: boolean
+          message_type: string | null
+          quoted_message_id: string | null
+          sender_id: string | null
+          sender_name: string | null
+          status: string | null
+          wa_message_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          conversation_id: string
+          created_at?: string
+          edited_at?: string | null
+          from_me?: boolean | null
+          id?: string
+          is_private?: boolean
+          message_type?: string | null
+          quoted_message_id?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+          status?: string | null
+          wa_message_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string
+          created_at?: string
+          edited_at?: string | null
+          from_me?: boolean | null
+          id?: string
+          is_private?: boolean
+          message_type?: string | null
+          quoted_message_id?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+          status?: string | null
+          wa_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uazapi_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "uazapi_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
