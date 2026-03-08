@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda: {
+        Row: {
+          cliente: number | null
+          data: string
+          dataatualizacao: string | null
+          datacadastro: string
+          descricao: string | null
+          hora_fim: string | null
+          hora_inicio: string | null
+          id: number
+          id_tarefa: number | null
+          idempresa: number | null
+          idusuario: number | null
+          lembrete: boolean | null
+          local: string | null
+          status: number | null
+          tipo: number | null
+          tipo_local: string | null
+          titulo: string
+        }
+        Insert: {
+          cliente?: number | null
+          data: string
+          dataatualizacao?: string | null
+          datacadastro?: string
+          descricao?: string | null
+          hora_fim?: string | null
+          hora_inicio?: string | null
+          id?: number
+          id_tarefa?: number | null
+          idempresa?: number | null
+          idusuario?: number | null
+          lembrete?: boolean | null
+          local?: string | null
+          status?: number | null
+          tipo?: number | null
+          tipo_local?: string | null
+          titulo: string
+        }
+        Update: {
+          cliente?: number | null
+          data?: string
+          dataatualizacao?: string | null
+          datacadastro?: string
+          descricao?: string | null
+          hora_fim?: string | null
+          hora_inicio?: string | null
+          id?: number
+          id_tarefa?: number | null
+          idempresa?: number | null
+          idusuario?: number | null
+          lembrete?: boolean | null
+          local?: string | null
+          status?: number | null
+          tipo?: number | null
+          tipo_local?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       area_atuacao: {
         Row: {
           ativo: boolean
@@ -77,6 +137,57 @@ export type Database = {
           id?: number
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      cliente_atributos: {
+        Row: {
+          datacadastro: string
+          id: number
+          idclientes: number
+          idtipodocumento: number
+          valor: string
+        }
+        Insert: {
+          datacadastro?: string
+          id?: number
+          idclientes: number
+          idtipodocumento: number
+          valor: string
+        }
+        Update: {
+          datacadastro?: string
+          id?: number
+          idclientes?: number
+          idtipodocumento?: number
+          valor?: string
+        }
+        Relationships: []
+      }
+      cliente_documento: {
+        Row: {
+          arquivo_base64: string
+          cliente_id: number
+          data_upload: string | null
+          id: number
+          nome_arquivo: string
+          tipo_documento_id: number
+        }
+        Insert: {
+          arquivo_base64: string
+          cliente_id: number
+          data_upload?: string | null
+          id?: number
+          nome_arquivo: string
+          tipo_documento_id: number
+        }
+        Update: {
+          arquivo_base64?: string
+          cliente_id?: number
+          data_upload?: string | null
+          id?: number
+          nome_arquivo?: string
+          tipo_documento_id?: number
         }
         Relationships: []
       }
@@ -321,6 +432,467 @@ export type Database = {
         }
         Relationships: []
       }
+      fornecedores: {
+        Row: {
+          ativo: boolean
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          complemento: string | null
+          datacadastro: string
+          documento: string | null
+          email: string | null
+          id: number
+          idempresa: number | null
+          nome: string
+          numero: string | null
+          rua: string | null
+          telefone: string | null
+          tipo: string | null
+          uf: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          datacadastro?: string
+          documento?: string | null
+          email?: string | null
+          id?: number
+          idempresa?: number | null
+          nome: string
+          numero?: string | null
+          rua?: string | null
+          telefone?: string | null
+          tipo?: string | null
+          uf?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          datacadastro?: string
+          documento?: string | null
+          email?: string | null
+          id?: number
+          idempresa?: number | null
+          nome?: string
+          numero?: string | null
+          rua?: string | null
+          telefone?: string | null
+          tipo?: string | null
+          uf?: string | null
+        }
+        Relationships: []
+      }
+      intimacoes: {
+        Row: {
+          arquivada: boolean
+          ativo: boolean
+          codigoclasse: string | null
+          created_at: string
+          data_cancelamento: string | null
+          data_disponibilizacao: string | null
+          destinatarios: string[] | null
+          destinatarios_advogados: string[] | null
+          external_id: string
+          hash: string | null
+          id: number
+          idempresa: number | null
+          idusuario: number | null
+          idusuario_leitura: number | null
+          lida_em: string | null
+          link: string | null
+          meio: string | null
+          motivo_cancelamento: string | null
+          nao_lida: boolean
+          nomeclasse: string | null
+          nomeorgao: string | null
+          numero_processo: string
+          numerocomunicacao: string | null
+          prazo: string | null
+          siglatribunal: string
+          status: string | null
+          texto: string | null
+          tipocomunicacao: string | null
+          tipodocumento: string | null
+          updated_at: string
+        }
+        Insert: {
+          arquivada?: boolean
+          ativo?: boolean
+          codigoclasse?: string | null
+          created_at?: string
+          data_cancelamento?: string | null
+          data_disponibilizacao?: string | null
+          destinatarios?: string[] | null
+          destinatarios_advogados?: string[] | null
+          external_id: string
+          hash?: string | null
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
+          idusuario_leitura?: number | null
+          lida_em?: string | null
+          link?: string | null
+          meio?: string | null
+          motivo_cancelamento?: string | null
+          nao_lida?: boolean
+          nomeclasse?: string | null
+          nomeorgao?: string | null
+          numero_processo: string
+          numerocomunicacao?: string | null
+          prazo?: string | null
+          siglatribunal?: string
+          status?: string | null
+          texto?: string | null
+          tipocomunicacao?: string | null
+          tipodocumento?: string | null
+          updated_at?: string
+        }
+        Update: {
+          arquivada?: boolean
+          ativo?: boolean
+          codigoclasse?: string | null
+          created_at?: string
+          data_cancelamento?: string | null
+          data_disponibilizacao?: string | null
+          destinatarios?: string[] | null
+          destinatarios_advogados?: string[] | null
+          external_id?: string
+          hash?: string | null
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
+          idusuario_leitura?: number | null
+          lida_em?: string | null
+          link?: string | null
+          meio?: string | null
+          motivo_cancelamento?: string | null
+          nao_lida?: boolean
+          nomeclasse?: string | null
+          nomeorgao?: string | null
+          numero_processo?: string
+          numerocomunicacao?: string | null
+          prazo?: string | null
+          siglatribunal?: string
+          status?: string | null
+          texto?: string | null
+          tipocomunicacao?: string | null
+          tipodocumento?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intimacoes_idempresa_fkey"
+            columns: ["idempresa"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oab_monitoradas: {
+        Row: {
+          created_at: string
+          dias_semana: number[] | null
+          empresa_id: number
+          id: number
+          numero: string
+          sync_from: string | null
+          tipo: string
+          uf: string
+          updated_at: string
+          usuario_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          dias_semana?: number[] | null
+          empresa_id: number
+          id?: number
+          numero: string
+          sync_from?: string | null
+          tipo: string
+          uf: string
+          updated_at?: string
+          usuario_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          dias_semana?: number[] | null
+          empresa_id?: number
+          id?: number
+          numero?: string
+          sync_from?: string | null
+          tipo?: string
+          uf?: string
+          updated_at?: string
+          usuario_id?: number | null
+        }
+        Relationships: []
+      }
+      oportunidade_documentos: {
+        Row: {
+          content: string
+          created_at: string
+          id: number
+          oportunidade_id: number
+          template_id: number | null
+          title: string
+          variables: Json
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: number
+          oportunidade_id: number
+          template_id?: number | null
+          title: string
+          variables?: Json
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: number
+          oportunidade_id?: number
+          template_id?: number | null
+          title?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
+      oportunidade_envolvidos: {
+        Row: {
+          documento: string | null
+          endereco: string | null
+          id: number
+          nome: string | null
+          oportunidade_id: number
+          polo: string | null
+          relacao: string | null
+          telefone: string | null
+        }
+        Insert: {
+          documento?: string | null
+          endereco?: string | null
+          id?: number
+          nome?: string | null
+          oportunidade_id: number
+          polo?: string | null
+          relacao?: string | null
+          telefone?: string | null
+        }
+        Update: {
+          documento?: string | null
+          endereco?: string | null
+          id?: number
+          nome?: string | null
+          oportunidade_id?: number
+          polo?: string | null
+          relacao?: string | null
+          telefone?: string | null
+        }
+        Relationships: []
+      }
+      oportunidade_faturamentos: {
+        Row: {
+          condicao_pagamento: string | null
+          criado_em: string | null
+          data_faturamento: string | null
+          forma_pagamento: string
+          id: number
+          observacoes: string | null
+          oportunidade_id: number
+          parcelas: number | null
+          valor: number | null
+        }
+        Insert: {
+          condicao_pagamento?: string | null
+          criado_em?: string | null
+          data_faturamento?: string | null
+          forma_pagamento: string
+          id?: number
+          observacoes?: string | null
+          oportunidade_id: number
+          parcelas?: number | null
+          valor?: number | null
+        }
+        Update: {
+          condicao_pagamento?: string | null
+          criado_em?: string | null
+          data_faturamento?: string | null
+          forma_pagamento?: string
+          id?: number
+          observacoes?: string | null
+          oportunidade_id?: number
+          parcelas?: number | null
+          valor?: number | null
+        }
+        Relationships: []
+      }
+      oportunidade_parcelas: {
+        Row: {
+          atualizado_em: string | null
+          criado_em: string | null
+          data_prevista: string | null
+          faturamento_id: number | null
+          id: number
+          idempresa: number | null
+          numero_parcela: number
+          oportunidade_id: number
+          quitado_em: string | null
+          status: string
+          valor: number
+          valor_pago: number | null
+        }
+        Insert: {
+          atualizado_em?: string | null
+          criado_em?: string | null
+          data_prevista?: string | null
+          faturamento_id?: number | null
+          id?: number
+          idempresa?: number | null
+          numero_parcela: number
+          oportunidade_id: number
+          quitado_em?: string | null
+          status?: string
+          valor: number
+          valor_pago?: number | null
+        }
+        Update: {
+          atualizado_em?: string | null
+          criado_em?: string | null
+          data_prevista?: string | null
+          faturamento_id?: number | null
+          id?: number
+          idempresa?: number | null
+          numero_parcela?: number
+          oportunidade_id?: number
+          quitado_em?: string | null
+          status?: string
+          valor?: number
+          valor_pago?: number | null
+        }
+        Relationships: []
+      }
+      oportunidade_sequence: {
+        Row: {
+          atual: number
+          empresa_id: number
+        }
+        Insert: {
+          atual: number
+          empresa_id: number
+        }
+        Update: {
+          atual?: number
+          empresa_id?: number
+        }
+        Relationships: []
+      }
+      oportunidades: {
+        Row: {
+          area_atuacao_id: number | null
+          audiencia_data: string | null
+          audiencia_horario: string | null
+          audiencia_local: string | null
+          comarca: string | null
+          contingenciamento: string | null
+          criado_por: number | null
+          data_criacao: string
+          detalhes: string | null
+          documentos_anexados: number | null
+          etapa_id: number | null
+          fase_id: number | null
+          forma_pagamento: string | null
+          id: number
+          idempresa: number | null
+          numero_processo_cnj: string | null
+          numero_protocolo: string | null
+          percentual_honorarios: number | null
+          prazo_proximo: string | null
+          qtde_parcelas: number | null
+          responsavel_id: number | null
+          sequencial_empresa: number
+          solicitante_id: number | null
+          status_id: number | null
+          tipo_processo_id: number
+          ultima_atualizacao: string
+          valor_causa: number | null
+          valor_entrada: number | null
+          valor_honorarios: number | null
+          vara_ou_orgao: string | null
+        }
+        Insert: {
+          area_atuacao_id?: number | null
+          audiencia_data?: string | null
+          audiencia_horario?: string | null
+          audiencia_local?: string | null
+          comarca?: string | null
+          contingenciamento?: string | null
+          criado_por?: number | null
+          data_criacao?: string
+          detalhes?: string | null
+          documentos_anexados?: number | null
+          etapa_id?: number | null
+          fase_id?: number | null
+          forma_pagamento?: string | null
+          id?: number
+          idempresa?: number | null
+          numero_processo_cnj?: string | null
+          numero_protocolo?: string | null
+          percentual_honorarios?: number | null
+          prazo_proximo?: string | null
+          qtde_parcelas?: number | null
+          responsavel_id?: number | null
+          sequencial_empresa: number
+          solicitante_id?: number | null
+          status_id?: number | null
+          tipo_processo_id: number
+          ultima_atualizacao?: string
+          valor_causa?: number | null
+          valor_entrada?: number | null
+          valor_honorarios?: number | null
+          vara_ou_orgao?: string | null
+        }
+        Update: {
+          area_atuacao_id?: number | null
+          audiencia_data?: string | null
+          audiencia_horario?: string | null
+          audiencia_local?: string | null
+          comarca?: string | null
+          contingenciamento?: string | null
+          criado_por?: number | null
+          data_criacao?: string
+          detalhes?: string | null
+          documentos_anexados?: number | null
+          etapa_id?: number | null
+          fase_id?: number | null
+          forma_pagamento?: string | null
+          id?: number
+          idempresa?: number | null
+          numero_processo_cnj?: string | null
+          numero_protocolo?: string | null
+          percentual_honorarios?: number | null
+          prazo_proximo?: string | null
+          qtde_parcelas?: number | null
+          responsavel_id?: number | null
+          sequencial_empresa?: number
+          solicitante_id?: number | null
+          status_id?: number | null
+          tipo_processo_id?: number
+          ultima_atualizacao?: string
+          valor_causa?: number | null
+          valor_entrada?: number | null
+          valor_honorarios?: number | null
+          vara_ou_orgao?: string | null
+        }
+        Relationships: []
+      }
       perfil_modulos: {
         Row: {
           modulo: string
@@ -365,6 +937,254 @@ export type Database = {
           ver_todas_conversas?: boolean
         }
         Relationships: []
+      }
+      pje_processo_documentos: {
+        Row: {
+          created_at: string
+          data_hora_juntada: string | null
+          href_binario: string | null
+          href_texto: string | null
+          id: number
+          id_codex: number | null
+          id_origem: string | null
+          nivel_sigilo: string | null
+          nome: string | null
+          numero_processo: string
+          payload: Json
+          processo_id: number
+          sequencia: number | null
+          tipo_codigo: number | null
+          tipo_nome: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_hora_juntada?: string | null
+          href_binario?: string | null
+          href_texto?: string | null
+          id?: number
+          id_codex?: number | null
+          id_origem?: string | null
+          nivel_sigilo?: string | null
+          nome?: string | null
+          numero_processo: string
+          payload?: Json
+          processo_id: number
+          sequencia?: number | null
+          tipo_codigo?: number | null
+          tipo_nome?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_hora_juntada?: string | null
+          href_binario?: string | null
+          href_texto?: string | null
+          id?: number
+          id_codex?: number | null
+          id_origem?: string | null
+          nivel_sigilo?: string | null
+          nome?: string | null
+          numero_processo?: string
+          payload?: Json
+          processo_id?: number
+          sequencia?: number | null
+          tipo_codigo?: number | null
+          tipo_nome?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pje_processo_documentos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "pje_processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pje_processo_movimentos: {
+        Row: {
+          created_at: string
+          data_hora: string | null
+          descricao: string | null
+          id: number
+          numero_processo: string
+          payload: Json
+          processo_id: number
+        }
+        Insert: {
+          created_at?: string
+          data_hora?: string | null
+          descricao?: string | null
+          id?: number
+          numero_processo: string
+          payload?: Json
+          processo_id: number
+        }
+        Update: {
+          created_at?: string
+          data_hora?: string | null
+          descricao?: string | null
+          id?: number
+          numero_processo?: string
+          payload?: Json
+          processo_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pje_processo_movimentos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "pje_processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pje_processo_partes: {
+        Row: {
+          created_at: string
+          documentos_principais: Json | null
+          id: number
+          nome: string | null
+          numero_processo: string
+          outros_nomes: Json | null
+          payload: Json
+          polo: string | null
+          processo_id: number
+          representantes: Json | null
+          sigilosa: boolean | null
+          tipo_parte: string | null
+          tipo_pessoa: string | null
+        }
+        Insert: {
+          created_at?: string
+          documentos_principais?: Json | null
+          id?: number
+          nome?: string | null
+          numero_processo: string
+          outros_nomes?: Json | null
+          payload?: Json
+          polo?: string | null
+          processo_id: number
+          representantes?: Json | null
+          sigilosa?: boolean | null
+          tipo_parte?: string | null
+          tipo_pessoa?: string | null
+        }
+        Update: {
+          created_at?: string
+          documentos_principais?: Json | null
+          id?: number
+          nome?: string | null
+          numero_processo?: string
+          outros_nomes?: Json | null
+          payload?: Json
+          polo?: string | null
+          processo_id?: number
+          representantes?: Json | null
+          sigilosa?: boolean | null
+          tipo_parte?: string | null
+          tipo_pessoa?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pje_processo_partes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "pje_processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pje_processos: {
+        Row: {
+          assunto: Json | null
+          classe: Json | null
+          cliente_id: number | null
+          created_at: string
+          data_ajuizamento: string | null
+          data_ultima_distribuicao: string | null
+          grau: Json | null
+          id: number
+          id_codex_tribunal: number | null
+          idempresa: number
+          idusuario: number
+          nivel_sigilo: number | null
+          numero_processo: string
+          orgao_julgador: Json | null
+          payload: Json
+          permite_peticionar: boolean
+          semcliente: string | null
+          sigla_tribunal: string
+          synced_at: string
+          tramitacao_ativa: Json | null
+          tribunal: Json | null
+          ultimo_movimento: Json | null
+          ultimo_movimento_data: string | null
+          updated_at: string
+          valor_acao: number | null
+        }
+        Insert: {
+          assunto?: Json | null
+          classe?: Json | null
+          cliente_id?: number | null
+          created_at?: string
+          data_ajuizamento?: string | null
+          data_ultima_distribuicao?: string | null
+          grau?: Json | null
+          id?: number
+          id_codex_tribunal?: number | null
+          idempresa: number
+          idusuario: number
+          nivel_sigilo?: number | null
+          numero_processo: string
+          orgao_julgador?: Json | null
+          payload?: Json
+          permite_peticionar?: boolean
+          semcliente?: string | null
+          sigla_tribunal: string
+          synced_at?: string
+          tramitacao_ativa?: Json | null
+          tribunal?: Json | null
+          ultimo_movimento?: Json | null
+          ultimo_movimento_data?: string | null
+          updated_at?: string
+          valor_acao?: number | null
+        }
+        Update: {
+          assunto?: Json | null
+          classe?: Json | null
+          cliente_id?: number | null
+          created_at?: string
+          data_ajuizamento?: string | null
+          data_ultima_distribuicao?: string | null
+          grau?: Json | null
+          id?: number
+          id_codex_tribunal?: number | null
+          idempresa?: number
+          idusuario?: number
+          nivel_sigilo?: number | null
+          numero_processo?: string
+          orgao_julgador?: Json | null
+          payload?: Json
+          permite_peticionar?: boolean
+          semcliente?: string | null
+          sigla_tribunal?: string
+          synced_at?: string
+          tramitacao_ativa?: Json | null
+          tribunal?: Json | null
+          ultimo_movimento?: Json | null
+          ultimo_movimento_data?: string | null
+          updated_at?: string
+          valor_acao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pje_processos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       planos: {
         Row: {
@@ -582,6 +1402,117 @@ export type Database = {
           id?: number
           key?: string
           label?: string
+        }
+        Relationships: []
+      }
+      tarefas: {
+        Row: {
+          ativo: boolean
+          atualizado_em: string | null
+          concluido: boolean
+          criado_em: string | null
+          data: string
+          descricao: string | null
+          dia_inteiro: boolean | null
+          hora: string | null
+          id: number
+          id_oportunidades: number | null
+          idempresa: number
+          idusuario: number
+          mostrar_na_agenda: boolean | null
+          prioridade: number | null
+          privada: boolean | null
+          recorrente: boolean | null
+          repetir_cada_unidade: string | null
+          repetir_intervalo: number | null
+          repetir_quantas_vezes: number | null
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          atualizado_em?: string | null
+          concluido?: boolean
+          criado_em?: string | null
+          data: string
+          descricao?: string | null
+          dia_inteiro?: boolean | null
+          hora?: string | null
+          id?: number
+          id_oportunidades?: number | null
+          idempresa: number
+          idusuario: number
+          mostrar_na_agenda?: boolean | null
+          prioridade?: number | null
+          privada?: boolean | null
+          recorrente?: boolean | null
+          repetir_cada_unidade?: string | null
+          repetir_intervalo?: number | null
+          repetir_quantas_vezes?: number | null
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          atualizado_em?: string | null
+          concluido?: boolean
+          criado_em?: string | null
+          data?: string
+          descricao?: string | null
+          dia_inteiro?: boolean | null
+          hora?: string | null
+          id?: number
+          id_oportunidades?: number | null
+          idempresa?: number
+          idusuario?: number
+          mostrar_na_agenda?: boolean | null
+          prioridade?: number | null
+          privada?: boolean | null
+          recorrente?: boolean | null
+          repetir_cada_unidade?: string | null
+          repetir_intervalo?: number | null
+          repetir_quantas_vezes?: number | null
+          titulo?: string
+        }
+        Relationships: []
+      }
+      tarefas_responsaveis: {
+        Row: {
+          id_tarefa: number
+          id_usuario: number
+        }
+        Insert: {
+          id_tarefa: number
+          id_usuario: number
+        }
+        Update: {
+          id_tarefa?: number
+          id_usuario?: number
+        }
+        Relationships: []
+      }
+      templates: {
+        Row: {
+          content: string
+          datacriacao: string
+          id: number
+          idempresa: number | null
+          idusuario: number | null
+          title: string
+        }
+        Insert: {
+          content: string
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
+          title: string
+        }
+        Update: {
+          content?: string
+          datacriacao?: string
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
+          title?: string
         }
         Relationships: []
       }
