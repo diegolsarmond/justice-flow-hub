@@ -1,15 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+// Re-export the auto-generated Supabase client to avoid duplication
+export { supabase } from '@/integrations/supabase/client';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        storageKey: 'jus-connect:supabase-auth',
-    },
-});
+// Export URL and key for any code that needs them directly
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? '';
 
 export { supabaseUrl, supabaseAnonKey };
