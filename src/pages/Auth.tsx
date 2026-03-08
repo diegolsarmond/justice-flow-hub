@@ -32,6 +32,11 @@ export default function Auth() {
     if (error) {
       toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
     } else {
+      if (rememberMe) {
+        localStorage.setItem("crm_saved_login", JSON.stringify({ email: loginEmail, password: loginPassword }));
+      } else {
+        localStorage.removeItem("crm_saved_login");
+      }
       navigate("/");
     }
   };
