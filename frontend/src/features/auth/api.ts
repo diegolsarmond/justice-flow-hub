@@ -144,6 +144,7 @@ export const signUpRequest = async (params: {
   nome: string;
   empresa?: string;
   telefone?: string;
+  planId?: number;
 }): Promise<{ message: string }> => {
   const { error } = await supabase.auth.signUp({
     email: params.email,
@@ -153,6 +154,8 @@ export const signUpRequest = async (params: {
         nome: params.nome,
         name: params.nome,
         telefone: params.telefone,
+        empresa: params.empresa,
+        planId: params.planId,
       },
       emailRedirectTo: window.location.origin,
     },
