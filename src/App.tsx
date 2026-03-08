@@ -13,6 +13,8 @@ import Clientes from "./pages/Clientes";
 import Prazos from "./pages/Prazos";
 import Tarefas from "./pages/Tarefas";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
