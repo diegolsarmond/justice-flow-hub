@@ -6,12 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Scale } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Scale, Eye, EyeOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function Auth() {
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const saved = JSON.parse(localStorage.getItem("crm_saved_login") || "null");
+  const [loginEmail, setLoginEmail] = useState(saved?.email || "");
+  const [loginPassword, setLoginPassword] = useState(saved?.password || "");
+  const [rememberMe, setRememberMe] = useState(!!saved);
+  const [showLoginPass, setShowLoginPass] = useState(false);
+  const [showSignupPass, setShowSignupPass] = useState(false);
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupNome, setSignupNome] = useState("");
@@ -27,6 +32,11 @@ export default function Auth() {
     if (error) {
       toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
     } else {
+      if (rememberMe) {
+        localStorage.setItem("crm_saved_login", JSON.stringify({ email: loginEmail, password: loginPassword }));
+      } else {
+        localStorage.removeItem("crm_saved_login");
+      }
       navigate("/");
     }
   };
@@ -67,7 +77,16 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Senha</Label>
-                  <Input id="login-password" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
+                  <div className="relative">
+                    <Input id="login-password" type={showLoginPass ? "text" : "password"} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required autoComplete="current-password" />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10" onClick={() => setShowLoginPass(!showLoginPass)}>
+                      {showLoginPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember" checked={rememberMe} onCheckedChange={(v) => setRememberMe(!!v)} />
+                  <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">Lembrar credenciais</Label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Entrando..." : "Entrar"}
@@ -91,7 +110,12 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Senha</Label>
-                  <Input id="signup-password" type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required minLength={6} />
+                  <div className="relative">
+                    <Input id="signup-password" type={showSignupPass ? "text" : "password"} value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-10 w-10" onClick={() => setShowSignupPass(!showSignupPass)}>
+                      {showSignupPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Cadastrando..." : "Cadastrar"}
