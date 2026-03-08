@@ -2156,6 +2156,7 @@ export type Database = {
           empresa_id: number | null
           empresa_nome: string | null
           id: string
+          must_change_password: boolean
           nome: string
           oab_numero: string | null
           oab_uf: string | null
@@ -2173,6 +2174,7 @@ export type Database = {
           empresa_id?: number | null
           empresa_nome?: string | null
           id?: string
+          must_change_password?: boolean
           nome: string
           oab_numero?: string | null
           oab_uf?: string | null
@@ -2190,6 +2192,7 @@ export type Database = {
           empresa_id?: number | null
           empresa_nome?: string | null
           id?: string
+          must_change_password?: boolean
           nome?: string
           oab_numero?: string | null
           oab_uf?: string | null
