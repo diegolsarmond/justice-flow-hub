@@ -20,7 +20,7 @@ create extension if not exists pgcrypto;
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
-create table if not exists public.sync_processos_log (
+CREATE TABLE IF NOT EXISTS public.sync_processos_log (
   id bigserial primary key,
   execution_id uuid not null default gen_random_uuid(),
   started_at timestamptz not null default now(),
