@@ -1,4 +1,5 @@
 import { getApiUrl } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 
 export type PlanOption = {
   id: number;
