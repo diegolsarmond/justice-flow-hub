@@ -30,6 +30,10 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
     root: path.resolve(__dirname, "frontend"),
+    build: {
+      outDir: path.resolve(__dirname, "dist"),
+      emptyOutDir: true,
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "frontend/src"),
