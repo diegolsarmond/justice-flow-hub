@@ -28,7 +28,6 @@ export default defineConfig(({ mode }) => {
       "import.meta.env.SERVER_URL_UAZAPI": JSON.stringify(env.SERVER_URL_UAZAPI),
     },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-    root: path.resolve(__dirname, "frontend"),
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,

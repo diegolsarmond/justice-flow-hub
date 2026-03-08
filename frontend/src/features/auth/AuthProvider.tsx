@@ -521,11 +521,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(stored.user);
     }
 
-    // Safety timeout: if validation takes too long, stop loading
-    const safetyTimeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 8000);
-
     const validateToken = async () => {
       try {
         const currentUser = await fetchCurrentUser(stored.token);
@@ -548,7 +543,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         console.warn("Failed to validate stored token", error);
       } finally {
-        clearTimeout(safetyTimeout);
         setIsLoading(false);
       }
     };
