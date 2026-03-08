@@ -10,9 +10,9 @@ import quantumLogo from "@/assets/quantum-logo.png";
 import { routes } from "@/config/routes";
 import { appConfig } from "@/config/app-config";
 import { Loader2 } from "lucide-react";
-import { getApiUrl } from "@/lib/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fetchPlanOptions, formatPlanPriceLabel, getComparableMonthlyPrice, type PlanOption } from "@/features/plans/api";
+import { signUpRequest, ApiError } from "@/features/auth/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -51,7 +51,6 @@ const Register = () => {
         const sortedPlans = [...plans].sort((a, b) => {
           const priceA = getComparableMonthlyPrice(a);
           const priceB = getComparableMonthlyPrice(b);
-          // Planos sem preço vão para o final
           if (priceA === null && priceB === null) return 0;
           if (priceA === null) return 1;
           if (priceB === null) return -1;
@@ -98,32 +97,6 @@ const Register = () => {
     [planOptions, selectedPlanId],
   );
 
-  const extractErrorMessage = async (response: Response) => {
-    try {
-      const data = await response.clone().json();
-      if (typeof data?.error === "string" && data.error.trim().length > 0) {
-        return data.error;
-      }
-      if (typeof data?.message === "string" && data.message.trim().length > 0) {
-        return data.message;
-      }
-    } catch (error) {
-      console.warn("Falha ao interpretar erro de cadastro", error);
-    }
-
-    try {
-      const text = await response.text();
-      const trimmed = text.trim();
-      if (trimmed.length > 0) {
-        return trimmed;
-      }
-    } catch (error) {
-      console.warn("Falha ao ler resposta de erro", error);
-    }
-
-    return "Não foi possível concluir o cadastro. Tente novamente.";
-  };
-
   const formatPhoneInput = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
     if (digits.length <= 2) {
@@ -150,16 +123,6 @@ const Register = () => {
       return;
     }
 
-    const parsedPlanId = Number.parseInt(selectedPlanId, 10);
-    if (!Number.isFinite(parsedPlanId)) {
-      toast({
-        variant: "destructive",
-        title: "Plano inválido",
-        description: "O plano selecionado é inválido. Atualize a página e tente novamente.",
-      });
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
       toast({
         variant: "destructive",
@@ -169,41 +132,37 @@ const Register = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres."
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const phoneDigits = formData.phone.replace(/\D/g, "");
-    const payload = {
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      company: formData.company.trim(),
-      password: formData.password,
-      phone: phoneDigits.length > 0 ? phoneDigits : undefined,
-      planId: parsedPlanId,
-    };
 
     try {
-      const response = await fetch(getApiUrl("auth/register"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json"
-        },
-        body: JSON.stringify(payload)
+      const result = await signUpRequest({
+        email: formData.email.trim(),
+        password: formData.password,
+        nome: formData.name.trim(),
+        empresa: formData.company.trim(),
+        telefone: phoneDigits.length > 0 ? phoneDigits : undefined,
+        planId: Number.parseInt(selectedPlanId, 10),
       });
-
-      if (!response.ok) {
-        const errorMessage = await extractErrorMessage(response);
-        throw new Error(errorMessage);
-      }
 
       toast({
         title: "Cadastro realizado!",
-        description: "Sua conta foi criada, confirme o e-mail para ter acesso ao sistema."
+        description: result.message,
       });
       navigate(routes.login);
     } catch (error) {
       const description =
-        error instanceof Error
+        error instanceof ApiError || error instanceof Error
           ? error.message
           : "Não foi possível concluir o cadastro. Tente novamente.";
       toast({
@@ -323,7 +282,6 @@ const Register = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {planOptions.map((plan, index) => {
-                    // O plano "mais contratado" é o penúltimo (antes do mais caro)
                     const isMostPopular = planOptions.length >= 2 && index === planOptions.length - 2;
                     return (
                       <SelectItem key={plan.id} value={String(plan.id)}>
@@ -394,6 +352,7 @@ const Register = () => {
                   onChange={handleInputChange}
                   placeholder="••••••••"
                   required
+                  minLength={6}
                   className="bg-background/50 border-input/50 focus:border-primary focus:ring-primary/20"
                 />
               </div>
