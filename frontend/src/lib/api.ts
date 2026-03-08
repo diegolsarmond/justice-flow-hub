@@ -72,14 +72,13 @@ function resolveFallbackBaseUrl(): string {
   }
 
   if (isDevEnvironment) {
-    if (windowOrigin) {
-      console.warn(
-        '[api.ts] Development environment without VITE_API_BASE_URL/VITE_API_URL; using current origin. Configure VITE_API_BASE_URL to avoid connection issues.',
-      );
+    // In hosted preview environments (e.g. Lovable), the origin is not a local backend,
+    // so fall through to the production default instead of using window.location.origin.
+    if (windowOrigin && isLocalhostUrl(windowOrigin)) {
       return windowOrigin;
     }
 
-    return 'http://localhost:3001';
+    return PRODUCTION_DEFAULT_API_URL;
   }
 
   if (windowOrigin) {
