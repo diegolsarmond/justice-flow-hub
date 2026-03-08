@@ -26,7 +26,14 @@ const port = process.env.PORT || 3001;
 // Middlewares
 // Middlewares
 app.use(cors({
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+    origin: [
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+        'https://790cb913-3101-4e13-aa69-b29280caa1aa.lovableproject.com',
+        'https://id-preview--790cb913-3101-4e13-aa69-b29280caa1aa.lovable.app',
+        'https://quantumjud-v2.lovable.app',
+        'https://quantumtecnologia.com.br',
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
