@@ -1,0 +1,553 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CRM Jurídico Design System - Professional Legal CRM Theme */
+
+@layer base {
+  :root {
+    /* Brand Colors - Modern Tech Theme */
+    --background: 210 40% 98%;
+    /* Levemente azulado/cinza para menos fadiga visual */
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - Vibrant Tech Blue */
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --primary-hover: 221 83% 45%;
+    --primary-light: 221 83% 92%;
+
+    /* Secondary - Light Gray */
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 217 33% 17%;
+
+    /* Success - Legal Green */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 71% 95%;
+
+    /* Warning - Legal Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 92% 95%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 217 13% 45%;
+
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 24%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 90%;
+    --input: 210 20% 96%;
+    --ring: 217 91% 24%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(210 20% 98%));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 71% 50%));
+
+    /* Shadows */
+    --shadow-card: 0 4px 6px -1px hsl(217 33% 17% / 0.1), 0 2px 4px -1px hsl(217 33% 17% / 0.06);
+    --shadow-elegant: 0 10px 25px -3px hsl(217 91% 24% / 0.1), 0 4px 6px -2px hsl(217 91% 24% / 0.05);
+    --shadow-hover: 0 20px 30px -6px hsl(217 91% 24% / 0.15), 0 8px 10px -4px hsl(217 91% 24% / 0.08);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Chart Colors - Light Mode */
+    --chart-1: 221 83% 53%;
+    /* Blue 600 */
+    --chart-2: 217 91% 24%;
+    /* Blue 900 */
+    --chart-3: 221 83% 60%;
+    /* Blue 500 */
+    --chart-4: 221 83% 45%;
+    /* Blue 700 */
+    --chart-5: 221 83% 70%;
+    /* Blue 400 */
+
+    --chart-secondary: 215 25% 27%;
+    /* Slate 700 */
+
+    /* Map Colors - Light Mode */
+    --chart-map-lowest: #f0fdf4;
+    --chart-map-low: #bbf7d0;
+    --chart-map-medium: #4ade80;
+    --chart-map-high: #16a34a;
+    --chart-map-highest: #166534;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 221 83% 60%;
+    --primary-foreground: 222 47% 11%;
+    --primary-hover: 221 83% 50%;
+    --primary-light: 221 83% 20%;
+
+    --secondary: 217 15% 22%;
+    --secondary-foreground: 210 20% 96%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 45% 25%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 60% 25%;
+
+    --muted: 217 15% 22%;
+    --muted-foreground: 217 10% 70%;
+
+    --accent: 217 15% 26%;
+    --accent-foreground: 210 20% 96%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 210 20% 96%;
+
+    --border: 217 15% 28%;
+    --input: 217 15% 22%;
+    --ring: 217 85% 55%;
+
+    --sidebar-background: 217 25% 11%;
+    --sidebar-foreground: 210 20% 96%;
+    --sidebar-primary: 217 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 15% 20%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 217 15% 28%;
+    --sidebar-ring: 217 85% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+
+    /* Chart Colors - Dark Mode */
+    --chart-1: 217 91% 60%;
+    /* Bright Blue */
+    --chart-2: 217 91% 50%;
+    --chart-3: 217 91% 40%;
+    --chart-4: 217 91% 70%;
+    --chart-5: 217 91% 80%;
+
+    --chart-secondary: 215 20% 65%;
+    /* Slate 400 */
+
+    /* Map Colors - Dark Mode */
+    --chart-map-lowest: #052e16;
+    --chart-map-low: #14532d;
+    --chart-map-medium: #15803d;
+    --chart-map-high: #22c55e;
+    --chart-map-highest: #4ade80;
+  }
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .wysiwyg-editor {
+    min-height: 297mm;
+    font-size: 16px;
+    line-height: 1.6;
+    color: inherit;
+  }
+
+  .wysiwyg-editor p {
+    margin-bottom: 0.75rem;
+  }
+
+  .wysiwyg-editor table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+
+  .wysiwyg-editor table td,
+  .wysiwyg-editor table th {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem;
+    min-width: 80px;
+  }
+
+  .variable-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    background-color: hsl(var(--primary) / 0.08);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.2);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .variable-tag:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .bg-grid-pattern {
+    background-image: linear-gradient(rgba(79, 84, 94, 0.08) 1px,
+        transparent 1px),
+      linear-gradient(90deg, rgba(79, 84, 94, 0.08) 1px, transparent 1px);
+
+    background-size: 48px 48px;
+    background-position: 0 0, 0 0;
+  }
+
+  /* White grid pattern for dark headers */
+  .bg-grid-white\/\[0\.02\] {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  }
+
+  /* Landing Page - Hero Gradient - Light Mode */
+  .bg-gradient-hero {
+    background: linear-gradient(135deg,
+        hsl(221, 83%, 25%) 0%,
+        hsl(221, 83%, 35%) 50%,
+        hsl(221, 70%, 45%) 100%);
+  }
+
+  /* Hero Gradient - Dark Mode uses primary colors */
+  .dark .bg-gradient-hero {
+    background: linear-gradient(135deg,
+        hsl(221, 83%, 15%) 0%,
+        hsl(221, 83%, 25%) 50%,
+        hsl(221, 70%, 35%) 100%);
+  }
+
+  /* Quantum Brand Gradients */
+  .bg-gradient-quantum {
+    background: linear-gradient(135deg,
+        hsl(221, 83%, 35%) 0%,
+        hsl(221, 83%, 50%) 100%);
+  }
+
+  .dark .bg-gradient-quantum {
+    background: linear-gradient(135deg,
+        hsl(221, 83%, 45%) 0%,
+        hsl(221, 83%, 60%) 100%);
+  }
+
+  .bg-gradient-card {
+    background: linear-gradient(180deg,
+        hsl(var(--card)) 0%,
+        hsl(var(--muted) / 0.3) 100%);
+  }
+
+  /* Quantum Colors */
+  .text-quantum-bright {
+    color: hsl(221, 83%, 53%);
+  }
+
+  .text-quantum-deep {
+    color: hsl(221, 83%, 25%);
+  }
+
+  .border-quantum-light {
+    border-color: hsl(221, 83%, 53% / 0.2);
+  }
+
+  /* Shadow Effects */
+  .shadow-quantum {
+    box-shadow: 0 20px 40px -12px hsl(221, 83%, 35% / 0.3),
+      0 8px 16px -8px hsl(221, 83%, 35% / 0.2);
+  }
+
+  /* Animations */
+  .animate-pulse-slow {
+    animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float-slow {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px hsl(221, 83%, 53% / 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px hsl(221, 83%, 53% / 0.5);
+  }
+}
+
+path[data-uf]:hover {
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes indeterminate-bar {
+  0% {
+    transform: translateX(-100%);
+    width: 30%;
+  }
+
+  50% {
+    width: 60%;
+  }
+
+  100% {
+    transform: translateX(400%);
+    width: 30%;
+  }
+}
+
+.animate-indeterminate-bar {
+  animation: indeterminate-bar 1.5s infinite linear;
+}
+
+/* ========== WhatsApp Web – tema para /conversas (identidade visual moderna) ========== */
+[data-theme="whatsapp"] {
+  /* Verde WhatsApp: #00a884 (teal) e variantes */
+  --primary: 166 100% 33%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 166 100% 28%;
+  --primary-light: 166 40% 94%;
+  /* Fundo lista de conversas */
+  --wa-sidebar-bg: 220 14% 96%;
+  --wa-sidebar-header: 0 0% 100%;
+  /* Fundo área do chat (creme, estilo WhatsApp Web) */
+  --wa-chat-bg: 30 22% 91%;
+  --wa-chat-bg-pattern: 30 18% 88%;
+  /* Balão enviado (verde claro #d9fdd3) */
+  --wa-sent-bubble: 120 22% 94%;
+  --wa-sent-bubble-foreground: 200 15% 18%;
+  /* Balão recebido */
+  --wa-received-bubble: 0 0% 100%;
+  --wa-received-bubble-foreground: 222 47% 11%;
+  /* Bordas suaves */
+  --border: 220 13% 91%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 215 16% 47%;
+}
+
+.dark [data-theme="whatsapp"] {
+  --primary: 166 100% 38%;
+  --primary-foreground: 0 0% 100%;
+  --wa-sidebar-bg: 222 47% 11%;
+  --wa-sidebar-header: 222 47% 14%;
+  --wa-chat-bg: 222 25% 12%;
+  --wa-chat-bg-pattern: 222 20% 10%;
+  --wa-sent-bubble: 166 40% 22%;
+  --wa-sent-bubble-foreground: 210 40% 98%;
+  --wa-received-bubble: 222 30% 18%;
+  --wa-received-bubble-foreground: 210 40% 98%;
+}
+
+/* ========== Modern Chat Theme – Premium WhatsApp Style ========== */
+:root {
+  /* Chat background pattern */
+  --chat-bg: 30 15% 95%;
+  --chat-pattern-opacity: 0.04;
+  
+  /* Message bubbles - Modern WhatsApp inspired */
+  --bubble-own: #d9fdd3;
+  --bubble-other: #ffffff;
+  --bubble-own-dark: #005c4b;
+  --bubble-other-dark: #202c33;
+  
+  /* Shadows for bubbles */
+  --shadow-bubble: 0 1px 0.5px rgba(11, 20, 26, 0.06);
+  --shadow-bubble-hover: 0 2px 8px rgba(11, 20, 26, 0.12);
+  
+  /* Header shadows */
+  --shadow-header: 0 1px 3px rgba(11, 20, 26, 0.08);
+  --shadow-sidebar: 1px 0 4px rgba(11, 20, 26, 0.05);
+  
+  /* Input area */
+  --input-bg: #f0f2f5;
+  --input-bg-dark: #202c33;
+}
+
+.dark {
+  --chat-bg: 222 25% 8%;
+  --bubble-own: #005c4b;
+  --bubble-other: #202c33;
+  --shadow-bubble: 0 1px 0.5px rgba(0, 0, 0, 0.25);
+  --shadow-bubble-hover: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-header: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-sidebar: 1px 0 4px rgba(0, 0, 0, 0.2);
+  --input-bg: #202c33;
+}
+
+/* Chat background pattern - doodle style like WhatsApp */
+.chat-bg-pattern {
+  background-color: #efeae2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='a' patternUnits='userSpaceOnUse' width='40' height='40' patternTransform='scale(2) rotate(0)'%3E%3Crect x='0' y='0' width='100%25' height='100%25' fill='hsla(30, 15%25, 95%25, 1)'/%3E%3Cpath d='M-10 30h60' stroke-linecap='round' stroke-width='0.5' stroke='hsla(0, 0%25, 0%25, 0.03)' fill='none'/%3E%3Cpath d='M-10 10h60' stroke-linecap='round' stroke-width='0.5' stroke='hsla(0, 0%25, 0%25, 0.03)' fill='none'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='800%25' height='800%25' transform='translate(0,0)' fill='url(%23a)'/%3E%3C/svg%3E");
+  position: relative;
+}
+
+.chat-bg-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, 
+    rgba(255,255,255,0.08) 0%, 
+    transparent 10%, 
+    transparent 90%, 
+    rgba(0,0,0,0.02) 100%
+  );
+  pointer-events: none;
+}
+
+.dark .chat-bg-pattern {
+  background-color: #0b141a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='a' patternUnits='userSpaceOnUse' width='40' height='40' patternTransform='scale(2) rotate(0)'%3E%3Crect x='0' y='0' width='100%25' height='100%25' fill='hsla(207, 45%25, 5%25, 1)'/%3E%3Cpath d='M-10 30h60' stroke-linecap='round' stroke-width='0.5' stroke='hsla(0, 0%25, 100%25, 0.02)' fill='none'/%3E%3Cpath d='M-10 10h60' stroke-linecap='round' stroke-width='0.5' stroke='hsla(0, 0%25, 100%25, 0.02)' fill='none'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='800%25' height='800%25' transform='translate(0,0)' fill='url(%23a)'/%3E%3C/svg%3E");
+}
+
+/* Fade in animation for messages */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.2s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Scrollbar styling for chat */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(134, 150, 160, 0.3) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(134, 150, 160, 0.3);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(134, 150, 160, 0.5);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

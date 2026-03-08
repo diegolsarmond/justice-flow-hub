@@ -1,0 +1,511 @@
+.container {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.modalContent {
+  max-width: min(1100px, calc(100vw - 3rem));
+  width: min(1100px, calc(100vw - 3rem));
+  max-height: min(92vh, 880px);
+  overflow: auto;
+}
+
+.modalWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.25rem 2rem 0;
+}
+
+.modalCloseButton {
+  border: none;
+  background: none;
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.modalCloseButton:hover,
+.modalCloseButton:focus-visible {
+  color: hsl(var(--foreground));
+  transform: translateY(-1px);
+}
+
+.modalCloseButton:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.modalBody {
+  padding-top: 1.5rem;
+}
+
+.inlineContainer {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+
+.integrationPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.statusCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  box-shadow: var(--shadow-card);
+}
+
+.statusHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sessionLabel {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.sessionName {
+  color: hsl(var(--foreground));
+  font-weight: 700;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.statusBadgeConnected {
+  background: hsl(var(--success-light));
+  color: hsl(var(--success));
+}
+
+.statusBadgePending {
+  background: hsl(var(--warning-light));
+  color: hsl(var(--warning));
+}
+
+.statusBadgeError {
+  background: hsl(var(--destructive) / 0.15);
+  color: hsl(var(--destructive));
+}
+
+:global(.dark) :local(.statusBadgeConnected) {
+  background: hsl(var(--success) / 0.25);
+  color: hsl(var(--success-foreground));
+}
+
+:global(.dark) :local(.statusBadgePending) {
+  background: hsl(var(--warning) / 0.25);
+  color: hsl(var(--warning-foreground));
+}
+
+:global(.dark) :local(.statusBadgeError) {
+  background: hsl(var(--destructive) / 0.25);
+  color: hsl(var(--destructive-foreground));
+}
+
+.sessionActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.sessionWarning {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  background: hsl(var(--warning-light));
+  color: hsl(var(--warning));
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.sessionWarning strong {
+  font-weight: 700;
+  color: inherit;
+}
+
+:global(.dark) :local(.sessionWarning) {
+  background: hsl(var(--warning) / 0.25);
+  color: hsl(var(--warning-foreground));
+}
+
+.sessionFeedback {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+}
+
+.statusSpinner,
+.buttonSpinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--muted-foreground) / 0.2);
+  border-top-color: hsl(var(--primary));
+  animation: spin 0.8s linear infinite;
+}
+
+.buttonSpinner {
+  border-color: currentColor;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.statusDescription {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+}
+
+.sessionError {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  background: hsl(var(--destructive) / 0.12);
+  color: hsl(var(--destructive));
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+:global(.dark) :local(.sessionError) {
+  background: hsl(var(--destructive) / 0.25);
+  color: hsl(var(--destructive-foreground));
+}
+
+.sessionMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.sessionMetaHighlight {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.qrSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px dashed hsl(var(--border));
+  background: hsl(var(--muted));
+}
+
+.qrHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.qrHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.qrActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.qrRefreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.qrDisconnectButton {
+  background: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+}
+
+.qrRefreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.qrRefreshButton:not(:disabled):hover,
+.qrRefreshButton:not(:disabled):focus-visible {
+  transform: translateY(-1px);
+}
+
+.qrRefreshButton:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.qrContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 220px;
+  text-align: center;
+}
+
+.qrImage {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  background: hsl(var(--card));
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+.qrPlaceholder {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.qrPlaceholderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.provisionButton {
+  background: hsl(var(--success));
+  color: hsl(var(--success-foreground, white));
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+}
+
+.provisionButton:not(:disabled):hover,
+.provisionButton:not(:disabled):focus-visible {
+  background: hsl(var(--success) / 0.9);
+}
+
+.refreshIconSpinning {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.integrationHeader h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.integrationHeader p {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+}
+
+.embedWrapper {
+  flex: 1;
+  min-height: 380px;
+}
+
+.fallbackMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1.75rem;
+  text-align: center;
+  border-radius: 1rem;
+  border: 1px dashed hsl(var(--border));
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.fallbackMessage h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.fallbackMessage p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.fallbackMessage code {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.85rem;
+  color: hsl(var(--foreground));
+}
+
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.instructions h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.instructions p {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.stepItem {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.85rem;
+}
+
+.stepBadge {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.stepContent h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stepIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--accent-foreground));
+}
+
+.stepContent p {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+}
+
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .modalContent {
+    width: min(100%, calc(100vw - 3rem));
+  }
+
+  .integrationPanel {
+    order: 2;
+  }
+
+  .instructions {
+    order: 1;
+    text-align: center;
+  }
+
+  .sessionActions {
+    justify-content: center;
+  }
+
+  .statusHeader {
+    align-items: center;
+  }
+
+  .sessionMetaRow {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .qrHeader {
+    justify-content: center;
+  }
+
+  .qrActions {
+    justify-content: center;
+  }
+
+  .stepItem {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .stepBadge {
+    margin-bottom: 0.35rem;
+  }
+}

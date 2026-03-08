@@ -1,0 +1,199 @@
+.printWrapper {
+  width: 100%;
+}
+
+.printArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.printCard {
+  transition: box-shadow 0.2s ease;
+}
+
+.printScroll {
+  width: 100%;
+}
+
+.printFooter {
+  width: 100%;
+}
+
+.printActive {
+  background: hsl(var(--card));
+}
+
+.printActive .printHidden {
+  display: none;
+}
+
+.printActive .printCard {
+  box-shadow: none;
+}
+
+@media print {
+  :global(body) {
+    background: hsl(var(--background)) !important;
+  }
+
+  .printWrapper {
+    padding: 0 !important;
+    background: hsl(var(--card)) !important;
+  }
+
+  .printArea {
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 1.5rem !important;
+  }
+
+  .printCard {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .printScroll {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  .printHidden {
+    display: none !important;
+  }
+
+  .printFooter {
+    margin-top: 24px !important;
+    padding-top: 16px !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+
+  @page {
+    margin: 20mm;
+  }
+}
+
+/* Modern UI Improvements - Premium Design */
+
+.modernGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  /* Increased gap for better breathing room */
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .modernGrid {
+    grid-template-columns: 2fr 1.1fr;
+    /* Optimized ratio */
+    align-items: start;
+    grid-auto-rows: min-content;
+  }
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 0;
+}
+
+.modernCard {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border) / 0.5);
+  border-radius: var(--radius);
+  /* Rounded corners */
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  /* Softer, deeper shadow */
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.modernCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, hsl(var(--primary) / 0.8), hsl(var(--primary) / 0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modernCard:hover {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+  border-color: hsl(var(--primary) / 0.3);
+  transform: translateY(-2px);
+}
+
+.modernCard:hover::before {
+  opacity: 1;
+}
+
+.cardHeaderDetails {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.4);
+  background: linear-gradient(to right, hsl(var(--muted) / 0.3), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitleModern {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: hsl(var(--foreground) / 0.9);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardContentModern {
+  padding: 1.5rem;
+}
+
+/* Specific Cards */
+.highlightCard {
+  background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--primary) / 0.05));
+  border: 1px solid hsl(var(--primary) / 0.2);
+}
+
+.highlightCard .cardContentModern {
+  padding: 2rem;
+}
+
+.statusValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: hsl(var(--primary));
+}
+
+.fieldGroup {
+  padding: 0.5rem 0;
+}
+
+.fieldLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 0.35rem;
+}
+
+.fieldValue {
+  font-size: 1rem;
+  /* Larger font for readability */
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  word-break: break-word;
+  line-height: 1.6;
+}

@@ -1,0 +1,171 @@
+import { useEffect, useMemo, useState } from "react";
+import { UserPlus, Sparkles } from "lucide-react";
+import type { ContactSuggestion } from "../types";
+import { Modal } from "./Modal";
+import styles from "./NewConversationModal.module.css";
+import { normalizeText } from "../utils/format";
+
+interface NewConversationModalProps {
+  open: boolean;
+  suggestions: ContactSuggestion[];
+  onClose: () => void;
+  onSelectConversation: (conversationId: string) => void;
+  onCreateConversation: (name: string) => Promise<string | null>;
+  allowCreate?: boolean;
+}
+
+export const NewConversationModal = ({
+  open,
+  suggestions,
+  onClose,
+  onSelectConversation,
+  onCreateConversation,
+  allowCreate = true,
+}: NewConversationModalProps) => {
+  const [search, setSearch] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setSearch("");
+      setIsCreating(false);
+    }
+  }, [open]);
+
+  const normalizedQuery = normalizeText(search);
+  const filtered = useMemo(() => {
+    if (!normalizedQuery) return suggestions;
+    return suggestions.filter((conversation) => {
+      const normalizedName = normalizeText(conversation.name);
+      const normalizedOwner = normalizeText(conversation.owner ?? "");
+      const normalizedJid = normalizeText(conversation.jid);
+      return (
+        normalizedName.includes(normalizedQuery) ||
+        (normalizedOwner && normalizedOwner.includes(normalizedQuery)) ||
+        normalizedJid.includes(normalizedQuery)
+      );
+    });
+  }, [normalizedQuery, suggestions]);
+
+  const exactMatch = useMemo(() => {
+    if (!normalizedQuery) return false;
+    return suggestions.some((conversation) => normalizeText(conversation.name) === normalizedQuery);
+  }, [normalizedQuery, suggestions]);
+
+  const getInitials = (name: string, fallback: string): string => {
+    const base = name.trim() || fallback;
+    if (!base) return "#";
+    return base.charAt(0).toUpperCase();
+  };
+
+  const canCreate =
+    allowCreate && normalizedQuery.length > 0 && !exactMatch && !isCreating;
+
+  const handleCreate = async () => {
+    if (!canCreate) return;
+    setIsCreating(true);
+    try {
+      const createdId = await onCreateConversation(search.trim());
+      if (createdId) {
+        onSelectConversation(createdId);
+        onClose();
+      }
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.key === "Enter" && canCreate) {
+      event.preventDefault();
+      void handleCreate();
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} ariaLabel="Iniciar nova conversa">
+      <div className={styles.wrapper}>
+        <div className={styles.closeRow}>
+          <button type="button" className={styles.closeButton} onClick={onClose}>
+            Fechar
+          </button>
+        </div>
+        <header className={styles.header}>
+          <h2>Nova conversa</h2>
+          <p>Pesquise um contato existente ou crie um novo canal de atendimento instantaneamente.</p>
+        </header>
+        <div className={`${styles.search} ${!allowCreate ? styles.searchStandalone : ""}`.trim()}>
+          <input
+            type="text"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Pesquisar cliente, processo ou etiqueta"
+            aria-label="Pesquisar contato"
+            autoFocus
+          />
+          {allowCreate && (
+            <button
+              type="button"
+              className={styles.createButton}
+              onClick={handleCreate}
+              disabled={!canCreate}
+            >
+              <UserPlus size={18} aria-hidden="true" />
+              {isCreating ? "Criando..." : "Criar contato"}
+            </button>
+          )}
+        </div>
+        <section aria-live="polite">
+          {filtered.length === 0 ? (
+            <div className={styles.empty}>
+              <Sparkles size={18} aria-hidden="true" />
+              {allowCreate ? (
+                <> Nenhum resultado. Pressione Enter para criar "{search.trim()}".</>
+              ) : (
+                <> Nenhum resultado encontrado para "{search.trim()}".</>
+              )}
+            </div>
+          ) : (
+            <ul className={styles.list} role="listbox" aria-label="Contatos sugeridos">
+              {filtered.map((conversation) => (
+                <li key={conversation.id}>
+                  <button
+                    type="button"
+                    className={styles.item}
+                    onClick={() => {
+                      onSelectConversation(conversation.id);
+                      onClose();
+                    }}
+                    aria-label={`Abrir conversa com ${conversation.name}`}
+                  >
+                    {conversation.avatar ? (
+                      <img
+                        src={conversation.avatar}
+                        alt=""
+                        className={styles.itemAvatar}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <div className={styles.itemAvatarFallback} aria-hidden="true">
+                        {getInitials(conversation.name, conversation.jid)}
+                      </div>
+                    )}
+                    <div>
+                      <div className={styles.itemName}>{conversation.name}</div>
+                      {(conversation.owner || conversation.jid) && (
+                        <div className={styles.itemDescription}>
+                          {conversation.owner ?? conversation.jid}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </Modal>
+  );
+};

@@ -1,0 +1,110 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  /* Modern WhatsApp-style page background */
+  background: #eae6df;
+  color: hsl(var(--foreground));
+}
+
+:global(.dark) .page {
+  background: #0b141a;
+}
+
+/* WhatsApp Web: fundo cinza claro na página de conversas */
+.page[data-theme="whatsapp"] {
+  background: #eae6df;
+}
+
+:global(.dark) .page[data-theme="whatsapp"] {
+  background: #0b141a;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: inherit;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.layout>aside {
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  /* Modern sidebar background */
+  background: #ffffff;
+}
+
+:global(.dark) .layout>aside {
+  background: #111b21;
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.25);
+}
+
+.page[data-theme="whatsapp"] .layout>aside {
+  box-shadow: 1px 0 6px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global(.dark) .page[data-theme="whatsapp"] .layout>aside {
+  background: #111b21;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.page[data-theme="whatsapp"] .layout>aside [data-sidebar-header] {
+  background: #f0f2f5;
+  border-bottom: none;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+:global(.dark) .page[data-theme="whatsapp"] .layout>aside [data-sidebar-header] {
+  background: #202c33;
+}
+
+/* Glass effect for header areas */
+.layout header {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    position: relative;
+  }
+
+  .layout> :last-child {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .layout[data-sidebar-open="false"] {
+    height: 100%;
+  }
+
+  .layout[data-sidebar-open="false"]> :last-child {
+    height: 100%;
+  }
+
+  /* Mobile slide animation */
+  .layout>aside {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .layout[data-sidebar-open="false"]>aside {
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+}

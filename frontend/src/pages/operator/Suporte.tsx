@@ -1,0 +1,1098 @@
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Download,
+  Eye,
+  FileText,
+  Loader2,
+  Paperclip,
+  X,
+  MessageSquare,
+  History,
+  Send,
+  PlusCircle,
+  HelpCircle,
+} from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
+import { getApiBaseUrl, joinUrl } from "@/lib/api";
+import { useAuth } from "@/features/auth/AuthProvider";
+
+const apiUrl = getApiBaseUrl();
+
+type SupportRequestStatus = "open" | "in_progress" | "resolved" | "closed" | "cancelled";
+
+interface SupportRequest {
+  id: number;
+  subject: string;
+  description: string;
+  status: SupportRequestStatus;
+  supportAgentId: number | null;
+  supportAgentName: string | null;
+  requesterId: number | null;
+  requesterName: string | null;
+  requesterEmail: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface SupportRequestListResponse {
+  items?: SupportRequest[];
+  total?: number;
+}
+
+type SupportRequestMessageSender = "requester" | "support";
+
+interface SupportRequestMessageAttachmentApi {
+  id: number;
+  messageId: number;
+  filename: string;
+  contentType: string | null;
+  fileSize: number | null;
+  createdAt: string;
+}
+
+interface SupportRequestMessageApi {
+  id: number;
+  supportRequestId: number;
+  sender: SupportRequestMessageSender;
+  message: string;
+  createdAt: string;
+  attachments?: SupportRequestMessageAttachmentApi[];
+}
+
+interface SupportRequestMessageListResponse {
+  items?: SupportRequestMessageApi[];
+}
+
+interface SupportRequestMessageAttachment extends SupportRequestMessageAttachmentApi {
+  downloadUrl: string;
+}
+
+interface SupportRequestMessage extends Omit<SupportRequestMessageApi, "attachments"> {
+  attachments: SupportRequestMessageAttachment[];
+}
+
+const statusLabels: Record<SupportRequestStatus, string> = {
+  open: "Aberta",
+  in_progress: "Em andamento",
+  resolved: "Resolvida",
+  closed: "Encerrada",
+  cancelled: "Cancelada",
+};
+
+const statusStyles: Record<SupportRequestStatus, string> = {
+  open: "border-blue-200 bg-blue-50 text-blue-700",
+  in_progress: "border-amber-200 bg-amber-50 text-amber-700",
+  resolved: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  closed: "border-slate-200 bg-slate-100 text-slate-700",
+  cancelled: "border-red-200 bg-red-50 text-red-700",
+};
+
+const MAX_ATTACHMENTS_PER_MESSAGE = 5;
+const completedStatuses: SupportRequestStatus[] = ["resolved", "closed", "cancelled"];
+
+function formatDateTime(isoString: string): string {
+  if (!isoString) {
+    return "-";
+  }
+
+  const date = new Date(isoString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  return date.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatRequesterInfo({
+  requesterName,
+  requesterEmail,
+}: Pick<SupportRequest, "requesterName" | "requesterEmail">): string {
+  if (requesterName && requesterEmail) {
+    return `${requesterName} (${requesterEmail})`;
+  }
+
+  if (requesterName) {
+    return requesterName;
+  }
+
+  if (requesterEmail) {
+    return requesterEmail;
+  }
+
+  return "—";
+}
+
+function formatFileSize(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes < 0) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  const units = ["KB", "MB", "GB", "TB"];
+  let value = bytes / 1024;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  const formatted = value >= 10 ? value.toFixed(0) : value.toFixed(1);
+  return `${formatted} ${units[unitIndex]}`;
+}
+
+function readFileAsBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        const base64 = result.includes(",") ? result.slice(result.indexOf(",") + 1) : result;
+        resolve(base64);
+      } else {
+        reject(new Error("Formato de arquivo inválido"));
+      }
+    };
+    reader.onerror = () => {
+      reject(new Error("Falha ao ler o arquivo selecionado"));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getMessageSenderLabel(
+  sender: SupportRequestMessageSender,
+  request?: SupportRequest | null,
+): string {
+  if (sender === "support") {
+    if (request?.supportAgentName) {
+      return request.supportAgentName;
+    }
+
+    return "Equipe de suporte";
+  }
+
+  if (!request) {
+    return "Solicitante";
+  }
+
+  const formatted = formatRequesterInfo({
+    requesterName: request.requesterName,
+    requesterEmail: request.requesterEmail,
+  });
+
+  return formatted === "—" ? "Solicitante" : formatted;
+}
+
+const formSchema = z.object({
+  subject: z.string().min(1, "Assunto é obrigatório"),
+  message: z.string().min(1, "Mensagem é obrigatória"),
+});
+
+export default function Suporte() {
+  const [requests, setRequests] = useState<SupportRequest[]>([]);
+  const [totalRequests, setTotalRequests] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<SupportRequest | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [messages, setMessages] = useState<SupportRequestMessage[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [messagesError, setMessagesError] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [cancellingRequestId, setCancellingRequestId] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { user } = useAuth();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { subject: "", message: "" },
+  });
+
+  const canCancelRequest = (request: SupportRequest) => !completedStatuses.includes(request.status);
+
+  const handleDialogChange = useCallback(
+    (open: boolean) => {
+      setIsDialogOpen(open);
+      if (!open) {
+        setSelectedRequest(null);
+        setMessages([]);
+        setMessagesError(null);
+        setNewMessage("");
+        setSelectedFiles([]);
+        setIsSendingMessage(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    },
+    [],
+  );
+
+  const fetchRequests = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!user) {
+        if (!signal?.aborted) {
+          setError(null);
+          setIsLoading(false);
+          setRequests([]);
+          setTotalRequests(0);
+          handleDialogChange(false);
+        }
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${apiUrl}/api/support`, { signal });
+
+        if (!response.ok) {
+          throw new Error("Falha ao carregar solicitações de suporte");
+        }
+
+        const data = (await response.json()) as SupportRequestListResponse;
+
+        if (!data || !Array.isArray(data.items)) {
+          throw new Error("Resposta inválida do servidor");
+        }
+
+        const normalizedUserEmail = user.email?.trim().toLowerCase() ?? "";
+
+        const filteredItems = data.items.filter((item) => {
+          if (typeof item.requesterId === "number" && Number.isFinite(item.requesterId)) {
+            return item.requesterId === user.id;
+          }
+
+          if (normalizedUserEmail && typeof item.requesterEmail === "string") {
+            return item.requesterEmail.trim().toLowerCase() === normalizedUserEmail;
+          }
+
+          return false;
+        });
+
+        setRequests(filteredItems);
+
+        let shouldCloseDialog = false;
+
+        setSelectedRequest((current) => {
+          if (!current) {
+            return current;
+          }
+
+          const updatedMatch = filteredItems.find((item) => item.id === current.id);
+
+          if (updatedMatch) {
+            return updatedMatch;
+          }
+
+          shouldCloseDialog = true;
+          return null;
+        });
+
+        if (shouldCloseDialog) {
+          handleDialogChange(false);
+        }
+
+        setTotalRequests(filteredItems.length);
+      } catch (requestError) {
+        if (signal?.aborted) {
+          return;
+        }
+
+        console.error("Erro ao carregar solicitações de suporte:", requestError);
+        setError("Não foi possível carregar as solicitações de suporte. Tente novamente.");
+      } finally {
+        if (!signal?.aborted) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [handleDialogChange, user],
+  );
+
+  const fetchRequestMessages = useCallback(
+    async (requestId: number) => {
+      setIsLoadingMessages(true);
+      setMessagesError(null);
+
+      try {
+        const response = await fetch(`${apiUrl}/api/support/${requestId}/messages`);
+
+        if (!response.ok) {
+          throw new Error("Failed to load support request messages");
+        }
+
+        const payload = (await response.json()) as
+          | SupportRequestMessageListResponse
+          | SupportRequestMessageApi[];
+
+        const items = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload.items)
+            ? payload.items
+            : [];
+
+        const parsedMessages: SupportRequestMessage[] = items.map((message) => ({
+          ...message,
+          attachments: (message.attachments ?? []).map((attachment) => ({
+            ...attachment,
+            downloadUrl: joinUrl(
+              apiUrl,
+              `/api/support/messages/${message.id}/attachments/${attachment.id}`,
+            ),
+          })),
+        }));
+
+        setMessages(parsedMessages);
+      } catch (messageError) {
+        console.error(
+          "Erro ao carregar mensagens da solicitação de suporte:",
+          messageError,
+        );
+        setMessagesError(
+          "Não foi possível carregar as mensagens desta solicitação. Tente novamente.",
+        );
+      } finally {
+        setIsLoadingMessages(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchRequests(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [fetchRequests]);
+
+  useEffect(() => {
+    if (!isDialogOpen || !selectedRequest?.id) {
+      return;
+    }
+
+    fetchRequestMessages(selectedRequest.id);
+  }, [fetchRequestMessages, isDialogOpen, selectedRequest?.id]);
+
+  const handleOpenRequest = (request: SupportRequest) => {
+    setSelectedRequest(request);
+    setMessages([]);
+    setMessagesError(null);
+    setNewMessage("");
+    setSelectedFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
+    }
+
+    setSelectedFiles((previous) => {
+      const remainingSlots = Math.max(0, MAX_ATTACHMENTS_PER_MESSAGE - previous.length);
+      const filesToAdd = files.slice(0, remainingSlots);
+
+      if (filesToAdd.length < files.length) {
+        toast({
+          title: `É possível anexar no máximo ${MAX_ATTACHMENTS_PER_MESSAGE} arquivos por mensagem.`,
+          variant: "destructive",
+        });
+      }
+
+      return [...previous, ...filesToAdd];
+    });
+
+    event.target.value = "";
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles((previous) => previous.filter((_, fileIndex) => fileIndex !== index));
+  };
+
+  const handleCancelRequest = async (request: SupportRequest) => {
+    if (!canCancelRequest(request)) {
+      return;
+    }
+
+    setCancellingRequestId(request.id);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/support/${request.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to cancel support request");
+      }
+
+      const updatedRequest = (await response.json()) as SupportRequest;
+
+      setRequests((previous) =>
+        previous.map((item) => (item.id === updatedRequest.id ? updatedRequest : item)),
+      );
+
+      setSelectedRequest((current) =>
+        current && current.id === updatedRequest.id ? updatedRequest : current,
+      );
+
+      toast({ title: "Solicitação cancelada" });
+
+      await fetchRequests();
+    } catch (cancelError) {
+      console.error("Erro ao cancelar solicitação de suporte:", cancelError);
+      toast({
+        title: "Não foi possível cancelar a solicitação",
+        description: "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingRequestId(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!selectedRequest) {
+      return;
+    }
+
+    if (!canCancelRequest(selectedRequest)) {
+      toast({
+        title: "Solicitação finalizada",
+        description: "Não é possível enviar novas mensagens para esta solicitação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const trimmedMessage = newMessage.trim();
+    const hasContent = trimmedMessage.length > 0 || selectedFiles.length > 0;
+
+    if (!hasContent) {
+      toast({
+        title: "Adicione uma mensagem ou anexo para enviar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingMessage(true);
+
+    try {
+      const attachmentsPayload = await Promise.all(
+        selectedFiles.map(async (file) => ({
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+          data: await readFileAsBase64(file),
+        })),
+      );
+
+      const response = await fetch(`${apiUrl}/api/support/${selectedRequest.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: trimmedMessage,
+          attachments: attachmentsPayload,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send support request message");
+      }
+
+      setNewMessage("");
+      setSelectedFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      toast({ title: "Mensagem enviada" });
+      await fetchRequestMessages(selectedRequest.id);
+    } catch (sendError) {
+      console.error("Erro ao enviar mensagem da solicitação de suporte:", sendError);
+      toast({
+        title: "Não foi possível enviar a mensagem",
+        description: "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingMessage(false);
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const res = await fetch(`${apiUrl}/api/support`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: values.subject,
+          description: values.message,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to send support request");
+      }
+      toast({ title: "Solicitação enviada com sucesso" });
+      form.reset();
+      await fetchRequests();
+    } catch (error) {
+      console.error("Erro ao enviar solicitação de suporte:", error);
+      toast({ title: "Erro ao enviar solicitação", variant: "destructive" });
+    }
+  };
+
+  const isSelectedRequestActive =
+    selectedRequest != null && canCancelRequest(selectedRequest);
+
+  return (
+    <div className="p-4 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <HelpCircle className="h-8 w-8 text-primary" />
+          Central de Suporte
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Como podemos ajudar você hoje? Abra um novo chamado ou acompanhe suas solicitações.
+        </p>
+      </div>
+
+      <Tabs defaultValue="new-ticket" className="w-full space-y-6">
+        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsTrigger value="new-ticket" className="flex items-center gap-2">
+            <PlusCircle className="h-4 w-4" />
+            Nova Solicitação
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Meus Chamados
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="new-ticket" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+          <Card className="border-muted/60 shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                Abrir Novo Chamado
+              </CardTitle>
+              <CardDescription>
+                Preencha o formulário abaixo para entrar em contato com nossa equipe de suporte.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+                  <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Assunto</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Resumo do problema ou dúvida..." {...field} className="bg-background/50" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descrição Detalhada</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Descreva detalhadamente o que está acontecendo..."
+                            className="min-h-[200px] resize-y bg-background/50"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end pt-2">
+                    <Button type="submit" disabled={form.formState.isSubmitting} size="lg" className="min-w-[150px]">
+                      {form.formState.isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" /> Enviar Solicitação
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+          <Card className="border-muted/60 shadow-sm">
+            <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6">
+              <div>
+                <CardTitle className="text-xl">Histórico de Chamados</CardTitle>
+                <CardDescription className="mt-1">
+                  Acompanhe o status e interaja com suas solicitações de suporte.
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => fetchRequests()} disabled={isLoading} className="gap-2">
+                <History className="h-4 w-4" />
+                Atualizar lista
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {error && requests.length > 0 && (
+                <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[160px]">Criado em</TableHead>
+                    <TableHead>Assunto</TableHead>
+                    <TableHead className="w-[150px]">Status</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead className="w-[220px]">Solicitante</TableHead>
+                    <TableHead className="w-[140px] text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading && requests.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                        Carregando solicitações...
+                      </TableCell>
+                    </TableRow>
+                  ) : error && requests.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center text-destructive">
+                        {error}
+                      </TableCell>
+                    </TableRow>
+                  ) : !isLoading && requests.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                        Nenhuma solicitação encontrada.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    requests.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="whitespace-nowrap font-medium text-foreground">
+                          {formatDateTime(request.createdAt)}
+                        </TableCell>
+                        <TableCell className="font-medium text-foreground">{request.subject}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <Badge variant="outline" className={statusStyles[request.status]}>
+                            {statusLabels[request.status]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <p className="max-w-xl whitespace-pre-line text-sm text-muted-foreground">
+                            {request.description}
+                          </p>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {formatRequesterInfo(request)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="inline-flex items-center gap-2"
+                              onClick={() => handleOpenRequest(request)}
+                            >
+                              <Eye className="h-4 w-4" />
+                              Visualizar
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="inline-flex items-center gap-2 text-destructive"
+                              onClick={() => handleCancelRequest(request)}
+                              disabled={!canCancelRequest(request) || cancellingRequestId === request.id}
+                            >
+                              {cancellingRequestId === request.id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  Cancelando
+                                </>
+                              ) : (
+                                <>
+                                  <X className="h-4 w-4" />
+                                  Cancelar
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+              {!isLoading && totalRequests > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Exibindo {requests.length} de {totalRequests}{" "}
+                  {totalRequests === 1 ? "solicitação" : "solicitações"} de suporte.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+        <DialogContent className="max-w-3xl space-y-6">
+          <DialogHeader>
+            <DialogTitle>Detalhes da solicitação</DialogTitle>
+            <DialogDescription>
+              Visualize o histórico de mensagens e envie novas atualizações para a equipe de
+              suporte.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRequest ? (
+            <div className="space-y-6">
+              <div className="grid gap-4 rounded-lg border border-border p-4 text-sm">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-foreground">{selectedRequest.subject}</p>
+                    <p className="text-muted-foreground">
+                      Criada em {formatDateTime(selectedRequest.createdAt)}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+                    <Badge variant="outline" className={statusStyles[selectedRequest.status]}>
+                      {statusLabels[selectedRequest.status]}
+                    </Badge>
+                    {canCancelRequest(selectedRequest) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="inline-flex items-center gap-2 text-destructive"
+                        onClick={() => handleCancelRequest(selectedRequest)}
+                        disabled={cancellingRequestId === selectedRequest.id}
+                      >
+                        {cancellingRequestId === selectedRequest.id ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" /> Cancelando
+                          </>
+                        ) : (
+                          <>
+                            <X className="h-4 w-4" /> Cancelar solicitação
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="grid gap-1">
+                  <Label className="text-xs font-medium uppercase text-muted-foreground">
+                    Descrição
+                  </Label>
+                  <p className="whitespace-pre-line text-sm text-foreground">
+                    {selectedRequest.description}
+                  </p>
+                </div>
+                <div className="grid gap-1">
+                  <Label className="text-xs font-medium uppercase text-muted-foreground">
+                    Solicitante
+                  </Label>
+                  <p className="text-sm text-foreground">{formatRequesterInfo(selectedRequest)}</p>
+                </div>
+                <div className="grid gap-1">
+                  <Label className="text-xs font-medium uppercase text-muted-foreground">
+                    Responsável pelo suporte
+                  </Label>
+                  <p className="text-sm text-foreground">
+                    {selectedRequest.supportAgentName ?? "Aguardando atribuição"}
+                  </p>
+                </div>
+                <div className="grid gap-1">
+                  <Label className="text-xs font-medium uppercase text-muted-foreground">
+                    Última atualização
+                  </Label>
+                  <p className="text-sm text-foreground">{formatDateTime(selectedRequest.updatedAt)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-base font-semibold text-foreground">Histórico de mensagens</h3>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => selectedRequest && fetchRequestMessages(selectedRequest.id)}
+                    disabled={isLoadingMessages}
+                    className="inline-flex items-center gap-2"
+                  >
+                    {isLoadingMessages ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Atualizando
+                      </>
+                    ) : (
+                      <>Atualizar histórico</>
+                    )}
+                  </Button>
+                </div>
+                <Separator />
+                {messagesError ? (
+                  <p className="text-sm text-destructive">{messagesError}</p>
+                ) : isLoadingMessages ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Carregando mensagens...
+                  </div>
+                ) : messages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhuma mensagem registrada para esta solicitação.
+                  </p>
+                ) : (
+                  <ScrollArea className="max-h-[320px] pr-4">
+                    <div className="space-y-4">
+                      {messages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex w-full ${message.sender === "requester" ? "justify-end" : "justify-start"
+                            }`}
+                        >
+                          <div
+                            className={`flex max-w-[85%] flex-col gap-1 rounded-2xl p-4 shadow-sm ${message.sender === "requester"
+                              ? "bg-primary text-primary-foreground rounded-br-sm"
+                              : "bg-muted border border-border rounded-bl-sm"
+                              }`}
+                          >
+                            <div className="flex items-center justify-between gap-4 text-xs opacity-90 mb-1">
+                              <span className="font-semibold">
+                                {getMessageSenderLabel(message.sender, selectedRequest)}
+                              </span>
+                              <span>{formatDateTime(message.createdAt)}</span>
+                            </div>
+
+                            {message.message && (
+                              <p className="whitespace-pre-line text-sm leading-relaxed">
+                                {message.message}
+                              </p>
+                            )}
+
+                            {message.attachments.length > 0 && (
+                              <div className={`mt-3 space-y-2 rounded-lg p-2 ${message.sender === "requester" ? "bg-primary-foreground/10" : "bg-background/50"
+                                }`}>
+                                <p className="text-xs font-semibold opacity-80 uppercase">
+                                  Anexos
+                                </p>
+                                <ul className="space-y-1">
+                                  {message.attachments.map((attachment) => (
+                                    <li key={attachment.id}>
+                                      <a
+                                        href={attachment.downloadUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className={`inline-flex items-center gap-2 text-sm hover:underline ${message.sender === "requester" ? "text-primary-foreground" : "text-primary"
+                                          }`}
+                                      >
+                                        <Paperclip className="h-3.5 w-3.5" />
+                                        <span className="truncate max-w-[200px]">{attachment.filename}</span>
+                                        {attachment.fileSize !== null && (
+                                          <span className="text-xs opacity-70">
+                                            ({formatFileSize(attachment.fileSize)})
+                                          </span>
+                                        )}
+                                        <Download className="h-3.5 w-3.5 ml-1" />
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="support-new-message" className="text-sm font-medium text-foreground">
+                  Enviar nova mensagem
+                </Label>
+                {!isSelectedRequestActive && (
+                  <p className="text-sm text-muted-foreground">
+                    Esta solicitação foi encerrada e não aceita novas mensagens.
+                  </p>
+                )}
+                <Textarea
+                  id="support-new-message"
+                  placeholder="Escreva sua mensagem para a equipe de suporte"
+                  value={newMessage}
+                  onChange={(event) => setNewMessage(event.target.value)}
+                  className="min-h-[120px]"
+                  disabled={isSendingMessage || !isSelectedRequestActive}
+                />
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={
+                          isSendingMessage ||
+                          !isSelectedRequestActive ||
+                          selectedFiles.length >= MAX_ATTACHMENTS_PER_MESSAGE
+                        }
+                        className="inline-flex items-center gap-2"
+                      >
+                        <Paperclip className="h-4 w-4" />
+                        Anexar arquivos
+                      </Button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={handleFileSelection}
+                      />
+                    </div>
+                    {selectedFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedFiles.map((file, index) => (
+                          <span
+                            key={`${file.name}-${index}`}
+                            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground"
+                          >
+                            <FileText className="h-3 w-3" />
+                            <span className="max-w-[160px] truncate" title={file.name}>
+                              {file.name}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {formatFileSize(file.size)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile(index)}
+                              className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-transparent text-muted-foreground hover:text-foreground"
+                              disabled={isSendingMessage}
+                            >
+                              <X className="h-3 w-3" />
+                              <span className="sr-only">Remover anexo</span>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <DialogFooter className="w-full sm:w-auto">
+                    <Button
+                      type="button"
+                      onClick={handleSendMessage}
+                      disabled={
+                        isSendingMessage ||
+                        !isSelectedRequestActive ||
+                        (newMessage.trim().length === 0 && selectedFiles.length === 0)
+                      }
+                      className="min-w-[160px]"
+                    >
+                      {isSendingMessage ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" /> Enviar mensagem
+                        </>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Selecione uma solicitação para visualizar os detalhes.
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
