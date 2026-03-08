@@ -2153,10 +2153,15 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           email: string | null
+          empresa_id: number | null
+          empresa_nome: string | null
           id: string
           nome: string
           oab_numero: string | null
           oab_uf: string | null
+          perfil_id: number | null
+          setor_id: number | null
+          setor_nome: string | null
           telefone: string | null
           updated_at: string
           user_id: string
@@ -2165,10 +2170,15 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          empresa_id?: number | null
+          empresa_nome?: string | null
           id?: string
           nome: string
           oab_numero?: string | null
           oab_uf?: string | null
+          perfil_id?: number | null
+          setor_id?: number | null
+          setor_nome?: string | null
           telefone?: string | null
           updated_at?: string
           user_id: string
@@ -2177,15 +2187,35 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string | null
+          empresa_id?: number | null
+          empresa_nome?: string | null
           id?: string
           nome?: string
           oab_numero?: string | null
           oab_uf?: string | null
+          perfil_id?: number | null
+          setor_id?: number | null
+          setor_nome?: string | null
           telefone?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quick_answers: {
         Row: {
