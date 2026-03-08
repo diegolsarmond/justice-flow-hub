@@ -252,6 +252,78 @@ export type Database = {
           },
         ]
       }
+      planos: {
+        Row: {
+          ativo: boolean
+          datacadastro: string
+          id: number
+          limite_advogados_intimacao: number | null
+          limite_advogados_processos: number | null
+          limite_clientes: number | null
+          limite_processos: number | null
+          limite_propostas: number | null
+          limite_usuarios: number | null
+          max_propostas: number | null
+          modulos: string | null
+          modulos_jsonb: Json | null
+          nome: string
+          recursos: string | null
+          sincronizacao_intimacoes_habilitada: boolean | null
+          sincronizacao_intimacoes_limite: number | null
+          sincronizacao_processos_cota: number | null
+          sincronizacao_processos_habilitada: boolean
+          sincronizacao_processos_limite: number | null
+          valor_anual: number
+          valor_mensal: number
+        }
+        Insert: {
+          ativo?: boolean
+          datacadastro?: string
+          id?: number
+          limite_advogados_intimacao?: number | null
+          limite_advogados_processos?: number | null
+          limite_clientes?: number | null
+          limite_processos?: number | null
+          limite_propostas?: number | null
+          limite_usuarios?: number | null
+          max_propostas?: number | null
+          modulos?: string | null
+          modulos_jsonb?: Json | null
+          nome: string
+          recursos?: string | null
+          sincronizacao_intimacoes_habilitada?: boolean | null
+          sincronizacao_intimacoes_limite?: number | null
+          sincronizacao_processos_cota?: number | null
+          sincronizacao_processos_habilitada?: boolean
+          sincronizacao_processos_limite?: number | null
+          valor_anual: number
+          valor_mensal: number
+        }
+        Update: {
+          ativo?: boolean
+          datacadastro?: string
+          id?: number
+          limite_advogados_intimacao?: number | null
+          limite_advogados_processos?: number | null
+          limite_clientes?: number | null
+          limite_processos?: number | null
+          limite_propostas?: number | null
+          limite_usuarios?: number | null
+          max_propostas?: number | null
+          modulos?: string | null
+          modulos_jsonb?: Json | null
+          nome?: string
+          recursos?: string | null
+          sincronizacao_intimacoes_habilitada?: boolean | null
+          sincronizacao_intimacoes_limite?: number | null
+          sincronizacao_processos_cota?: number | null
+          sincronizacao_processos_habilitada?: boolean
+          sincronizacao_processos_limite?: number | null
+          valor_anual?: number
+          valor_mensal?: number
+        }
+        Relationships: []
+      }
       prazos: {
         Row: {
           created_at: string
