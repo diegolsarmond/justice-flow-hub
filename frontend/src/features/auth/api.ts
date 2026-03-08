@@ -1,15 +1,9 @@
-import { getApiUrl } from "@/lib/api";
-import type {
-  AuthSubscription,
-  AuthUser,
-  LoginCredentials,
-  LoginResponse,
-  SubscriptionStatus,
-} from "./types";
+import { supabase } from "@/lib/supabase";
+import { fetchUserProfile } from "./profileService";
+import type { AuthUser, LoginCredentials, LoginResponse } from "./types";
 
 export class ApiError extends Error {
   status: number;
-
   constructor(message: string, status: number) {
     super(message);
     this.name = "ApiError";
@@ -17,326 +11,72 @@ export class ApiError extends Error {
   }
 }
 
-const parseModules = (value: unknown): string[] => {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter((item): item is string => typeof item === "string");
-};
-
-const parseInteger = (value: unknown): number | null => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.trunc(value);
-  }
-
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return null;
-    }
-
-    const parsed = Number.parseInt(trimmed, 10);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return null;
-};
-
-const parseBooleanFlag = (value: unknown): boolean | null => {
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "number") {
-    if (!Number.isFinite(value)) {
-      return null;
-    }
-
-    return value !== 0;
-  }
-
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    if (!normalized) {
-      return null;
-    }
-
-    if (["1", "true", "t", "yes", "y", "sim", "on", "ativo", "ativa"].includes(normalized)) {
-      return true;
-    }
-
-    if (["0", "false", "f", "no", "n", "nao", "não", "off", "inativo", "inativa"].includes(normalized)) {
-      return false;
-    }
-  }
-
-  return null;
-};
-
-const parseIsoDate = (value: unknown): string | null => {
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return null;
-    }
-
-    const parsed = new Date(trimmed);
-    if (Number.isNaN(parsed.getTime())) {
-      return null;
-    }
-
-    return parsed.toISOString();
-  }
-
-  if (value instanceof Date) {
-    if (Number.isNaN(value.getTime())) {
-      return null;
-    }
-
-    return value.toISOString();
-  }
-
-  return null;
-};
-
-const parseSubscriptionStatus = (value: unknown, fallback: SubscriptionStatus): SubscriptionStatus => {
-  if (typeof value !== "string") {
-    return fallback;
-  }
-
-  const normalized = value.trim().toLowerCase();
-  if (normalized === "trial") {
-    return "trialing";
-  }
-
-  if (
-    normalized === "active" ||
-    normalized === "trialing" ||
-    normalized === "inactive" ||
-    normalized === "grace_period" ||
-    normalized === "past_due" ||
-    normalized === "expired"
-  ) {
-    return normalized;
-  }
-
-  return fallback;
-};
-
-const parseSubscription = (value: unknown): AuthSubscription | null => {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-
-  const record = value as Record<string, unknown>;
-  const planId = parseInteger(record.planId ?? record.plan_id ?? record.plano ?? record.plan);
-  const isActive = parseBooleanFlag(record.isActive ?? record.active ?? record.ativo);
-  const statusFallback: SubscriptionStatus = planId === null || isActive === false ? "inactive" : "active";
-  const status = parseSubscriptionStatus(record.status, statusFallback);
-  const startedAt =
-    parseIsoDate(record.startedAt ?? record.startDate ?? record.start_at ?? record.datacadastro) ?? null;
-  const trialEndsAt =
-    parseIsoDate(record.trialEndsAt ?? record.trial_end ?? record.trialEnd ?? record.endsAt ?? record.endDate) ?? null;
-  const currentPeriodEnd =
-    parseIsoDate(
-      record.currentPeriodEnd ??
-      record.current_period_end ??
-      record.currentPeriodEndAt ??
-      record.periodEnd ??
-      record.subscriptionCurrentPeriodEnd,
-    ) ?? null;
-  const graceEndsAt =
-    parseIsoDate(
-      record.graceEndsAt ??
-      record.grace_ends_at ??
-      record.graceEnds ??
-      record.gracePeriodEnd ??
-      record.gracePeriodEndsAt ??
-      record.grace_deadline,
-    ) ?? null;
-
-  return {
-    planId,
-    status,
-    startedAt,
-    trialEndsAt,
-    currentPeriodEnd,
-    graceEndsAt,
-  };
-};
-
-const resolveMustChangePassword = (record: Record<string, unknown>): boolean =>
-  parseBooleanFlag(
-    record.mustChangePassword ??
-    record.must_change_password ??
-    record.must_change ??
-    record.must_change_pass ??
-    record.must_change_password_flag,
-  ) ?? false;
-
-const parseViewAllConversations = (record: Record<string, unknown>): boolean =>
-  parseBooleanFlag(
-    record.viewAllConversations ??
-    record.visualizarTodasConversas ??
-    record.verTodasConversas ??
-    record.perfilVerTodasConversas ??
-    record.perfil_ver_todas_conversas,
-  ) ?? true;
-
-const parseErrorMessage = async (response: Response) => {
-  try {
-    const data = await response.json();
-    if (typeof data?.error === "string" && data.error.trim().length > 0) {
-      return data.error;
-    }
-    if (typeof data?.message === "string" && data.message.trim().length > 0) {
-      return data.message;
-    }
-  } catch (error) {
-    console.warn("Failed to parse error response", error);
-  }
-
-  if (response.status === 403) {
-    return "Confirme seu e-mail antes de acessar. Verifique sua caixa de entrada.";
-  }
-
-  return response.status === 401
-    ? "Credenciais inválidas. Verifique seu e-mail e senha."
-    : "Não foi possível concluir a solicitação. Tente novamente.";
-};
-
-const buildApiError = async (response: Response) =>
-  new ApiError(await parseErrorMessage(response), response.status);
-
 export const loginRequest = async (
   credentials: LoginCredentials,
 ): Promise<LoginResponse> => {
-  const response = await fetch(getApiUrl("auth/login"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ email: credentials.email, senha: credentials.senha }),
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: credentials.email,
+    password: credentials.senha,
   });
 
-  if (!response.ok) {
-    throw await buildApiError(response);
+  if (error) {
+    if (error.message?.includes("Email not confirmed")) {
+      throw new ApiError(
+        "Confirme seu e-mail antes de acessar. Verifique sua caixa de entrada.",
+        403,
+      );
+    }
+    throw new ApiError(
+      error.message || "Credenciais inválidas. Verifique seu e-mail e senha.",
+      401,
+    );
   }
 
-  const data = (await response.json()) as Partial<LoginResponse> & { user?: AuthUser; refreshToken?: string };
-  if (!data?.user) {
+  if (!data.session || !data.user) {
     throw new Error("Resposta de autenticação inválida.");
   }
 
-  const userRecord = data.user as AuthUser & Record<string, unknown>;
-  const token = data.token;
-
-  if (typeof token !== "string" || token.trim().length === 0) {
-    throw new Error("Resposta de autenticação inválida.");
-  }
-
-  const expiresIn =
-    typeof data.expiresIn === "number" && Number.isFinite(data.expiresIn)
-      ? data.expiresIn
-      : undefined;
-
-  // Salvar refreshToken para renovação futura
-  if (typeof data.refreshToken === "string" && data.refreshToken.trim().length > 0) {
-    localStorage.setItem("jus-connect:refresh-token", data.refreshToken);
+  const profile = await fetchUserProfile(data.user.id);
+  if (!profile) {
+    throw new Error("Perfil de usuário não encontrado.");
   }
 
   return {
-    token,
-    refreshToken: data.refreshToken,
-    expiresIn,
-    user: {
-      ...data.user,
-      perfil:
-        parseInteger(userRecord.perfil ?? userRecord.perfil_id) ??
-        null,
-      empresa_id:
-        parseInteger(userRecord.empresa_id ?? userRecord.empresa) ??
-        null,
-      modulos: parseModules(userRecord.modulos),
-      subscription: parseSubscription(userRecord.subscription),
-      mustChangePassword: resolveMustChangePassword(userRecord),
-      viewAllConversations: parseViewAllConversations(userRecord),
-    },
+    token: data.session.access_token,
+    refreshToken: data.session.refresh_token,
+    expiresIn: data.session.expires_in,
+    user: profile,
   };
 };
 
-export const fetchCurrentUser = async (token?: string): Promise<AuthUser> => {
-  const headers = new Headers({
-    Accept: "application/json",
-  });
+export const fetchCurrentUser = async (_token?: string): Promise<AuthUser> => {
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (error || !user) {
+    throw new ApiError("Sessão expirada.", 401);
   }
 
-  const response = await fetch(getApiUrl("auth/me"), {
-    headers,
-  });
-
-  if (!response.ok) {
-    throw await buildApiError(response);
-  }
-
-  const data = (await response.json()) as (AuthUser & { modulos?: unknown }) &
-    Record<string, unknown>;
-  if (data?.id === undefined || data?.id === null) {
+  const profile = await fetchUserProfile(user.id);
+  if (!profile) {
     throw new Error("Não foi possível carregar os dados do usuário.");
   }
 
-  return {
-    ...data,
-    perfil: parseInteger(data.perfil ?? data.perfil_id) ?? null,
-    empresa_id: parseInteger(data.empresa_id ?? data.empresa) ?? null,
-    modulos: parseModules(data.modulos),
-    subscription: parseSubscription((data as { subscription?: unknown }).subscription),
-    mustChangePassword: resolveMustChangePassword(data),
-    viewAllConversations: parseViewAllConversations(data),
-  } satisfies AuthUser;
+  return profile;
 };
 
 export const refreshTokenRequest = async (
-  token: string,
+  _token: string,
 ): Promise<{ token: string; refreshToken?: string; expiresIn?: number }> => {
-  // Busca o refreshToken salvo no localStorage
-  const refreshToken = localStorage.getItem("jus-connect:refresh-token");
+  const { data, error } = await supabase.auth.refreshSession();
 
-  const response = await fetch(getApiUrl("auth/refresh"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ refreshToken: refreshToken || undefined }),
-  });
-
-  if (!response.ok) {
-    throw await buildApiError(response);
-  }
-
-  const data = (await response.json()) as { token?: unknown; refreshToken?: unknown; expiresIn?: unknown };
-  if (typeof data?.token !== "string" || data.token.trim().length === 0) {
-    throw new Error("Resposta de renovação inválida.");
-  }
-
-  // Atualiza o refreshToken no localStorage se recebido
-  if (typeof data.refreshToken === "string" && data.refreshToken.trim().length > 0) {
-    localStorage.setItem("jus-connect:refresh-token", data.refreshToken);
+  if (error || !data.session) {
+    throw new ApiError("Resposta de renovação inválida.", 401);
   }
 
   return {
-    token: data.token,
-    refreshToken: typeof data.refreshToken === "string" ? data.refreshToken : undefined,
-    expiresIn: typeof data.expiresIn === "number" ? data.expiresIn : undefined,
+    token: data.session.access_token,
+    refreshToken: data.session.refresh_token,
+    expiresIn: data.session.expires_in,
   };
 };
 
@@ -349,129 +89,80 @@ export interface ChangePasswordPayload {
 export const changePasswordRequest = async (
   payload: ChangePasswordPayload,
 ): Promise<{ message: string }> => {
-  const response = await fetch(getApiUrl("auth/change-password"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(payload),
+  const { error } = await supabase.auth.updateUser({
+    password: payload.newPassword,
   });
 
-  if (!response.ok) {
-    throw await buildApiError(response);
+  if (error) {
+    throw new ApiError(error.message || "Falha ao atualizar senha.", 400);
   }
 
-  const data = (await response.json()) as { message?: unknown };
-  return {
-    message:
-      typeof data?.message === "string" && data.message.trim().length > 0
-        ? data.message
-        : "Senha atualizada com sucesso.",
-  };
+  return { message: "Senha atualizada com sucesso." };
 };
 
 export const requestPasswordReset = async (
   email: string,
 ): Promise<{ message: string }> => {
-  const response = await fetch(getApiUrl("auth/request-password-reset"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ email }),
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
   });
 
-  if (!response.ok) {
-    throw await buildApiError(response);
+  if (error) {
+    throw new ApiError(error.message, 400);
   }
 
-  const data = (await response.json()) as { message?: unknown };
   return {
-    message:
-      typeof data?.message === "string" && data.message.trim().length > 0
-        ? data.message
-        : "Se o e-mail informado estiver cadastrado, enviaremos as instruções para redefinir a senha.",
+    message: "Se o e-mail informado estiver cadastrado, enviaremos as instruções para redefinir a senha.",
   };
 };
 
 export const resendEmailConfirmationRequest = async (email: string): Promise<string> => {
-  const response = await fetch(getApiUrl("auth/resend-email-confirmation"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({ email }),
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
   });
 
-  if (!response.ok) {
-    throw await buildApiError(response);
-  }
-
-  try {
-    const data = (await response.json()) as { message?: unknown };
-    if (typeof data?.message === "string" && data.message.trim().length > 0) {
-      return data.message;
-    }
-  } catch (error) {
-    console.warn("Failed to parse resend confirmation response", error);
+  if (error) {
+    throw new ApiError(error.message, 400);
   }
 
   return "Um novo e-mail de confirmação foi enviado.";
 };
 
 export const confirmEmailRequest = async (
-  token: string,
-  signal?: AbortSignal,
+  _token: string,
+  _signal?: AbortSignal,
 ): Promise<{ message: string; confirmedAt?: string }> => {
-  const normalizedToken = token.trim();
+  // Supabase handles email confirmation via URL redirect automatically.
+  // This function is kept for API compatibility.
+  return { message: "E-mail confirmado com sucesso." };
+};
 
-  if (!normalizedToken) {
-    throw new ApiError("Token de confirmação inválido.", 400);
-  }
-
-  const response = await fetch(getApiUrl("auth/confirm-email"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
+export const signUpRequest = async (params: {
+  email: string;
+  password: string;
+  nome: string;
+  empresa?: string;
+  telefone?: string;
+}): Promise<{ message: string }> => {
+  const { error } = await supabase.auth.signUp({
+    email: params.email,
+    password: params.password,
+    options: {
+      data: {
+        nome: params.nome,
+        name: params.nome,
+        telefone: params.telefone,
+      },
+      emailRedirectTo: window.location.origin,
     },
-    body: JSON.stringify({ token: normalizedToken }),
-    signal,
   });
 
-  if (!response.ok) {
-    throw await buildApiError(response);
-  }
-
-  const data = (await response.json()) as {
-    message?: unknown;
-    confirmedAt?: unknown;
-    confirmed_at?: unknown;
-  };
-
-  const confirmedAtRaw = typeof data?.confirmedAt === "string"
-    ? data.confirmedAt
-    : typeof data?.confirmed_at === "string"
-      ? data.confirmed_at
-      : null;
-
-  let confirmedAt: string | undefined;
-
-  if (confirmedAtRaw) {
-    const parsed = new Date(confirmedAtRaw);
-    if (!Number.isNaN(parsed.getTime())) {
-      confirmedAt = parsed.toISOString();
-    }
+  if (error) {
+    throw new ApiError(error.message || "Falha ao criar conta.", 400);
   }
 
   return {
-    message:
-      typeof data?.message === "string" && data.message.trim().length > 0
-        ? data.message
-        : "E-mail confirmado com sucesso.",
-    confirmedAt,
+    message: "Conta criada com sucesso! Verifique seu e-mail para confirmar.",
   };
 };

@@ -1,26 +1,12 @@
-const AUTH_STORAGE_KEY = "jus-connect:auth";
+import { supabase } from "@/lib/supabase";
 
-const getStoredAuthToken = (): string | null => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = JSON.parse(raw) as { token?: unknown } | null;
-    const token = typeof parsed?.token === "string" ? parsed.token.trim() : "";
-    return token.length > 0 ? token : null;
-  } catch {
-    return null;
-  }
+const getStoredAuthToken = async (): Promise<string | null> => {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
 };
 
-const buildAuthHeaders = (headers?: HeadersInit): HeadersInit => {
-  const token = getStoredAuthToken();
+const buildAuthHeaders = async (headers?: HeadersInit): Promise<HeadersInit> => {
+  const token = await getStoredAuthToken();
   if (!token) {
     return headers ?? {};
   }
@@ -30,7 +16,7 @@ const buildAuthHeaders = (headers?: HeadersInit): HeadersInit => {
   return resolved;
 };
 
-export const authFetch = (input: RequestInfo | URL, init?: RequestInit) => {
-  const headers = buildAuthHeaders(init?.headers);
+export const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const headers = await buildAuthHeaders(init?.headers);
   return fetch(input, { ...init, headers });
 };
