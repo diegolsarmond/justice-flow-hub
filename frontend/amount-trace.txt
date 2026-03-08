@@ -1,0 +1,13 @@
+474: valor_causa?: string | number | null;
+475: valor_da_causa?: string | number | null;
+476: amount?: string | number | null;
+601: amount: string;
+622: valorDaCausa: string;
+1829: processo.amount ??
+1830: processo.valor_causa ??
+1831: processo.valor_da_causa ??
+1833: normalizarTextoGenerico(obterMetadata("valor_da_causa", "valorCausa", "amount", "valor_causa")) ??
+1847: valorDaCausa: valorCausa,
+1883: amount: valorCausa,
+2261: { rotulo: "Valor da causa", valor: dados.amount },
+3447: {viewModel.dados.amount}
