@@ -7,7 +7,7 @@ create extension if not exists pgcrypto;
 -- =====================================================
 -- 1) INSTANCES
 -- =====================================================
-create table if not exists public.instances (
+CREATE TABLE IF NOT EXISTS public.instances (
   id uuid primary key default gen_random_uuid(),
   uazapi_instance_id text not null,
   uazapi_token text,
@@ -68,7 +68,7 @@ END $$;
 -- =====================================================
 -- 2) CONVERSATIONS
 -- =====================================================
-create table if not exists public.conversations (
+CREATE TABLE IF NOT EXISTS public.conversations (
   id uuid primary key default gen_random_uuid(),
   instance_id uuid not null,
   wa_chat_id text not null,
@@ -153,7 +153,7 @@ create index if not exists idx_conversations_assigned_to
 -- =====================================================
 -- 3) MESSAGES
 -- =====================================================
-create table if not exists public.messages (
+CREATE TABLE IF NOT EXISTS public.messages (
   id uuid primary key default gen_random_uuid(),
   conversation_id uuid not null,
   instance_id uuid,
@@ -272,7 +272,7 @@ execute function public.set_message_instance_id();
 -- =====================================================
 -- 4) MESSAGE ATTACHMENTS (usado pelos handlers)
 -- =====================================================
-create table if not exists public.message_attachments (
+CREATE TABLE IF NOT EXISTS public.message_attachments (
   id uuid primary key default gen_random_uuid(),
   message_id uuid not null,
   chat_id text,
