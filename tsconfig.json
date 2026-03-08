@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node"],
-    "typeRoots": ["backend/node_modules/@types"],
-    "baseUrl": "."
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "typeRoots": [
+      "backend/node_modules/@types"
+    ],
+    "types": [
+      "node"
+    ]
   },
-  "include": ["vite.config.ts", "types/vite-config.d.ts"]
+  "include": [
+    "vite.config.ts",
+    "types/vite-config.d.ts"
+  ]
 }
