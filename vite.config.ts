@@ -5,7 +5,6 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // Carrega todas as variáveis de ambiente, inclusive as que não começam com VITE_
   const env = loadEnv(mode, process.cwd(), "");
 
   const proxyTarget =
@@ -29,7 +28,6 @@ export default defineConfig(({ mode }) => {
       "import.meta.env.SERVER_URL_UAZAPI": JSON.stringify(env.SERVER_URL_UAZAPI),
     },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-    root: path.resolve(__dirname, "frontend"),
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,
