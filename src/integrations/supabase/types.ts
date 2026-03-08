@@ -14,243 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      api_tokens: {
-        Row: {
-          access_token: string
-          created_at: string
-          expires_at: string | null
-          id: string
-          metadata: Json | null
-          oab_numero: string | null
-          oab_uf: string | null
-          provider: string
-          refresh_token: string | null
-          token_type: string | null
-          updated_at: string
-        }
-        Insert: {
-          access_token: string
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          metadata?: Json | null
-          oab_numero?: string | null
-          oab_uf?: string | null
-          provider?: string
-          refresh_token?: string | null
-          token_type?: string | null
-          updated_at?: string
-        }
-        Update: {
-          access_token?: string
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          metadata?: Json | null
-          oab_numero?: string | null
-          oab_uf?: string | null
-          provider?: string
-          refresh_token?: string | null
-          token_type?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       clientes: {
         Row: {
+          ativo: boolean
+          bairro: string | null
           cep: string | null
           cidade: string | null
-          cpf_cnpj: string | null
-          created_at: string
+          complemento: string | null
+          datacadastro: string
+          documento: string | null
           email: string | null
-          endereco: string | null
-          id: string
+          id: number
+          idempresa: number | null
+          idusuario: number | null
           nome: string
-          observacoes: string | null
+          numero: string | null
+          rua: string | null
           telefone: string | null
-          tipo_pessoa: string
+          tipo: string
           uf: string | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
+          ativo?: boolean
+          bairro?: string | null
           cep?: string | null
           cidade?: string | null
-          cpf_cnpj?: string | null
-          created_at?: string
+          complemento?: string | null
+          datacadastro?: string
+          documento?: string | null
           email?: string | null
-          endereco?: string | null
-          id?: string
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
           nome: string
-          observacoes?: string | null
+          numero?: string | null
+          rua?: string | null
           telefone?: string | null
-          tipo_pessoa?: string
+          tipo: string
           uf?: string | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
+          ativo?: boolean
+          bairro?: string | null
           cep?: string | null
           cidade?: string | null
-          cpf_cnpj?: string | null
-          created_at?: string
+          complemento?: string | null
+          datacadastro?: string
+          documento?: string | null
           email?: string | null
-          endereco?: string | null
-          id?: string
+          id?: number
+          idempresa?: number | null
+          idusuario?: number | null
           nome?: string
-          observacoes?: string | null
+          numero?: string | null
+          rua?: string | null
           telefone?: string | null
-          tipo_pessoa?: string
+          tipo?: string
           uf?: string | null
-          updated_at?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clientes_idempresa_fkey"
+            columns: ["idempresa"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      empresas: {
+        Row: {
+          asaas_customer_id: string | null
+          asaas_subscription_id: string | null
+          ativo: boolean
+          cnpj: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          datacadastro: string
+          email: string | null
+          grace_expires_at: string | null
+          id: number
+          nome_empresa: string
+          plano: number | null
+          responsavel: number | null
+          subscription_cadence: string | null
+          subscription_current_period_ends_at: string | null
+          subscription_grace_period_ends_at: string | null
+          subscription_pending_plan: string | null
+          subscription_status: string | null
+          subscription_trial_ends_at: string | null
+          telefone: string | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
+        }
+        Insert: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          ativo?: boolean
+          cnpj?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          datacadastro?: string
+          email?: string | null
+          grace_expires_at?: string | null
+          id?: number
+          nome_empresa: string
+          plano?: number | null
+          responsavel?: number | null
+          subscription_cadence?: string | null
+          subscription_current_period_ends_at?: string | null
+          subscription_grace_period_ends_at?: string | null
+          subscription_pending_plan?: string | null
+          subscription_status?: string | null
+          subscription_trial_ends_at?: string | null
+          telefone?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+        }
+        Update: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          ativo?: boolean
+          cnpj?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          datacadastro?: string
+          email?: string | null
+          grace_expires_at?: string | null
+          id?: number
+          nome_empresa?: string
+          plano?: number | null
+          responsavel?: number | null
+          subscription_cadence?: string | null
+          subscription_current_period_ends_at?: string | null
+          subscription_grace_period_ends_at?: string | null
+          subscription_pending_plan?: string | null
+          subscription_status?: string | null
+          subscription_trial_ends_at?: string | null
+          telefone?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "empresas_plano_fkey"
+            columns: ["plano"]
+            isOneToOne: false
+            referencedRelation: "planos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      perfil_modulos: {
+        Row: {
+          modulo: string
+          perfil_id: number
+        }
+        Insert: {
+          modulo: string
+          perfil_id: number
+        }
+        Update: {
+          modulo?: string
+          perfil_id?: number
         }
         Relationships: []
       }
-      intimacoes: {
+      perfis: {
         Row: {
-          codigo_classe: string | null
-          comunicacao_id: number | null
-          created_at: string
-          data_disponibilizacao: string | null
-          destinatario_advogados: Json | null
-          destinatarios: Json | null
-          hash: string | null
-          id: string
-          link: string | null
-          meio: string | null
-          meio_completo: string | null
-          nome_classe: string | null
-          nome_orgao: string | null
-          numero_comunicacao: number | null
-          numero_processo: string | null
-          processo_id: string | null
-          sigla_tribunal: string | null
-          status: string | null
-          texto: string | null
-          tipo_comunicacao: string | null
-          tipo_documento: string | null
-          updated_at: string
+          ativo: boolean
+          datacriacao: string
+          empresa_id: number | null
+          id: number
+          idempresa: number | null
+          nome: string
+          ver_todas_conversas: boolean
         }
         Insert: {
-          codigo_classe?: string | null
-          comunicacao_id?: number | null
-          created_at?: string
-          data_disponibilizacao?: string | null
-          destinatario_advogados?: Json | null
-          destinatarios?: Json | null
-          hash?: string | null
-          id?: string
-          link?: string | null
-          meio?: string | null
-          meio_completo?: string | null
-          nome_classe?: string | null
-          nome_orgao?: string | null
-          numero_comunicacao?: number | null
-          numero_processo?: string | null
-          processo_id?: string | null
-          sigla_tribunal?: string | null
-          status?: string | null
-          texto?: string | null
-          tipo_comunicacao?: string | null
-          tipo_documento?: string | null
-          updated_at?: string
+          ativo?: boolean
+          datacriacao?: string
+          empresa_id?: number | null
+          id?: number
+          idempresa?: number | null
+          nome: string
+          ver_todas_conversas?: boolean
         }
         Update: {
-          codigo_classe?: string | null
-          comunicacao_id?: number | null
-          created_at?: string
-          data_disponibilizacao?: string | null
-          destinatario_advogados?: Json | null
-          destinatarios?: Json | null
-          hash?: string | null
-          id?: string
-          link?: string | null
-          meio?: string | null
-          meio_completo?: string | null
-          nome_classe?: string | null
-          nome_orgao?: string | null
-          numero_comunicacao?: number | null
-          numero_processo?: string | null
-          processo_id?: string | null
-          sigla_tribunal?: string | null
-          status?: string | null
-          texto?: string | null
-          tipo_comunicacao?: string | null
-          tipo_documento?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "intimacoes_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: false
-            referencedRelation: "processos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      partes_processo: {
-        Row: {
-          created_at: string
-          documento_numero: string | null
-          documento_tipo: string | null
-          id: string
-          nome: string
-          oab_numero: string | null
-          oab_uf: string | null
-          polo: string | null
-          processo_id: string
-          representante_cpf: string | null
-          representante_nome: string | null
-          representante_situacao: string | null
-          representante_tipo: string | null
-          sigilosa: boolean | null
-          tipo_parte: string | null
-          tipo_pessoa: string | null
-        }
-        Insert: {
-          created_at?: string
-          documento_numero?: string | null
-          documento_tipo?: string | null
-          id?: string
-          nome: string
-          oab_numero?: string | null
-          oab_uf?: string | null
-          polo?: string | null
-          processo_id: string
-          representante_cpf?: string | null
-          representante_nome?: string | null
-          representante_situacao?: string | null
-          representante_tipo?: string | null
-          sigilosa?: boolean | null
-          tipo_parte?: string | null
-          tipo_pessoa?: string | null
-        }
-        Update: {
-          created_at?: string
-          documento_numero?: string | null
-          documento_tipo?: string | null
-          id?: string
+          ativo?: boolean
+          datacriacao?: string
+          empresa_id?: number | null
+          id?: number
+          idempresa?: number | null
           nome?: string
-          oab_numero?: string | null
-          oab_uf?: string | null
-          polo?: string | null
-          processo_id?: string
-          representante_cpf?: string | null
-          representante_nome?: string | null
-          representante_situacao?: string | null
-          representante_tipo?: string | null
-          sigilosa?: boolean | null
-          tipo_parte?: string | null
-          tipo_pessoa?: string | null
+          ver_todas_conversas?: boolean
         }
-        Relationships: [
-          {
-            foreignKeyName: "partes_processo_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: false
-            referencedRelation: "processos"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       planos: {
         Row: {
@@ -324,146 +285,6 @@ export type Database = {
         }
         Relationships: []
       }
-      prazos: {
-        Row: {
-          created_at: string
-          data_inicio: string
-          data_vencimento: string
-          descricao: string
-          id: string
-          intimacao_id: string | null
-          observacoes: string | null
-          prioridade: string | null
-          processo_id: string | null
-          responsavel_id: string | null
-          status: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          data_inicio?: string
-          data_vencimento: string
-          descricao: string
-          id?: string
-          intimacao_id?: string | null
-          observacoes?: string | null
-          prioridade?: string | null
-          processo_id?: string | null
-          responsavel_id?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          data_inicio?: string
-          data_vencimento?: string
-          descricao?: string
-          id?: string
-          intimacao_id?: string | null
-          observacoes?: string | null
-          prioridade?: string | null
-          processo_id?: string | null
-          responsavel_id?: string | null
-          status?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prazos_intimacao_id_fkey"
-            columns: ["intimacao_id"]
-            isOneToOne: false
-            referencedRelation: "intimacoes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "prazos_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: false
-            referencedRelation: "processos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      processos: {
-        Row: {
-          advogado_responsavel: string | null
-          assunto: string | null
-          ativo: boolean | null
-          classe_judicial: string | null
-          cliente_id: string | null
-          created_at: string
-          data_distribuicao: string | null
-          data_ultimo_movimento: string | null
-          grau: string | null
-          id: string
-          instancia: string | null
-          monitorar_processo: boolean | null
-          nivel_sigilo: number | null
-          numero_cnj: string
-          observacoes: string | null
-          orgao_julgador: string | null
-          permite_peticionar: boolean | null
-          status: string | null
-          tribunal: string | null
-          updated_at: string
-          valor_acao: number | null
-        }
-        Insert: {
-          advogado_responsavel?: string | null
-          assunto?: string | null
-          ativo?: boolean | null
-          classe_judicial?: string | null
-          cliente_id?: string | null
-          created_at?: string
-          data_distribuicao?: string | null
-          data_ultimo_movimento?: string | null
-          grau?: string | null
-          id?: string
-          instancia?: string | null
-          monitorar_processo?: boolean | null
-          nivel_sigilo?: number | null
-          numero_cnj: string
-          observacoes?: string | null
-          orgao_julgador?: string | null
-          permite_peticionar?: boolean | null
-          status?: string | null
-          tribunal?: string | null
-          updated_at?: string
-          valor_acao?: number | null
-        }
-        Update: {
-          advogado_responsavel?: string | null
-          assunto?: string | null
-          ativo?: boolean | null
-          classe_judicial?: string | null
-          cliente_id?: string | null
-          created_at?: string
-          data_distribuicao?: string | null
-          data_ultimo_movimento?: string | null
-          grau?: string | null
-          id?: string
-          instancia?: string | null
-          monitorar_processo?: boolean | null
-          nivel_sigilo?: number | null
-          numero_cnj?: string
-          observacoes?: string | null
-          orgao_julgador?: string | null
-          permite_peticionar?: boolean | null
-          status?: string | null
-          tribunal?: string | null
-          updated_at?: string
-          valor_acao?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "processos_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -503,53 +324,6 @@ export type Database = {
         }
         Relationships: []
       }
-      tarefas: {
-        Row: {
-          created_at: string
-          data_vencimento: string | null
-          descricao: string | null
-          id: string
-          prioridade: string | null
-          processo_id: string | null
-          responsavel_id: string | null
-          status: string | null
-          titulo: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          data_vencimento?: string | null
-          descricao?: string | null
-          id?: string
-          prioridade?: string | null
-          processo_id?: string | null
-          responsavel_id?: string | null
-          status?: string | null
-          titulo: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          data_vencimento?: string | null
-          descricao?: string | null
-          id?: string
-          prioridade?: string | null
-          processo_id?: string | null
-          responsavel_id?: string | null
-          status?: string | null
-          titulo?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tarefas_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: false
-            referencedRelation: "processos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           id: string
@@ -567,6 +341,93 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      usuarios: {
+        Row: {
+          ativo: boolean
+          auth_user_id: string | null
+          cpf: string | null
+          datacriacao: string
+          email: string
+          email_confirmed_at: string | null
+          empresa: number
+          empresa_id: number | null
+          id: number
+          must_change_password: boolean | null
+          nome_completo: string
+          oab: string | null
+          observacoes: string | null
+          perfil: number
+          perfil_id: number | null
+          senha: string | null
+          setor: number | null
+          status: boolean
+          telefone: string | null
+          ultimo_login: string | null
+          welcome_email_pending: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          auth_user_id?: string | null
+          cpf?: string | null
+          datacriacao?: string
+          email: string
+          email_confirmed_at?: string | null
+          empresa: number
+          empresa_id?: number | null
+          id?: number
+          must_change_password?: boolean | null
+          nome_completo: string
+          oab?: string | null
+          observacoes?: string | null
+          perfil: number
+          perfil_id?: number | null
+          senha?: string | null
+          setor?: number | null
+          status?: boolean
+          telefone?: string | null
+          ultimo_login?: string | null
+          welcome_email_pending?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          auth_user_id?: string | null
+          cpf?: string | null
+          datacriacao?: string
+          email?: string
+          email_confirmed_at?: string | null
+          empresa?: number
+          empresa_id?: number | null
+          id?: number
+          must_change_password?: boolean | null
+          nome_completo?: string
+          oab?: string | null
+          observacoes?: string | null
+          perfil?: number
+          perfil_id?: number | null
+          senha?: string | null
+          setor?: number | null
+          status?: boolean
+          telefone?: string | null
+          ultimo_login?: string | null
+          welcome_email_pending?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuarios_empresa_fkey"
+            columns: ["empresa"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usuarios_perfil_fkey"
+            columns: ["perfil"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
