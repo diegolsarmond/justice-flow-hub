@@ -72,10 +72,14 @@ function resolveFallbackBaseUrl(): string {
   }
 
   if (isDevEnvironment) {
-    // In hosted preview environments (e.g. Lovable), the origin is not a local backend,
-    // so fall through to the production default instead of using window.location.origin.
     if (windowOrigin && isLocalhostUrl(windowOrigin)) {
       return windowOrigin;
+    }
+
+    // In hosted preview environments (e.g. Lovable), use the production backend
+    // since the backend runs on the same domain in production
+    if (windowOrigin) {
+      return PRODUCTION_DEFAULT_API_URL;
     }
 
     return PRODUCTION_DEFAULT_API_URL;
