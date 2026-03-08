@@ -1,54 +1,33 @@
-import { Component, ReactNode, Suspense, lazy } from 'react'
-const Spline = lazy(() => import('@splinetool/react-spline'))
+import { useEffect } from 'react'
+import { cn } from "@/lib/utils"
 
 interface SplineSceneProps {
   scene: string
   className?: string
 }
 
-interface SplineErrorBoundaryProps {
-  fallback: ReactNode
-  children: ReactNode
-}
+const VIEWER_SCRIPT_ID = "spline-viewer-script";
+const VIEWER_SCRIPT_SRC = "https://unpkg.com/@splinetool/viewer@1.9.395/build/spline-viewer.js";
 
-class SplineErrorBoundary extends Component<SplineErrorBoundaryProps, { hasError: boolean }> {
-  state = { hasError: false }
-
-  static getDerivedStateFromError() {
-    return { hasError: true }
-  }
-
-  componentDidCatch(error: Error) {
-    console.error(error)
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback
-    }
-
-    return this.props.children
-  }
-}
+const ensureViewerScript = () => {
+  if (document.getElementById(VIEWER_SCRIPT_ID)) return;
+  const script = document.createElement("script");
+  script.id = VIEWER_SCRIPT_ID;
+  script.src = VIEWER_SCRIPT_SRC;
+  script.type = "module";
+  script.async = true;
+  document.head.appendChild(script);
+};
 
 export function SplineScene({ scene, className }: SplineSceneProps) {
-  const fallback = (
-    <div className="w-full h-full flex items-center justify-center">
-      <span className="loader"></span>
-    </div>
-  )
+  useEffect(() => { ensureViewerScript(); }, []);
 
   return (
-    <SplineErrorBoundary
-      key={scene}
-      fallback={fallback}
-    >
-      <Suspense fallback={fallback}>
-        <Spline
-          scene={scene}
-          className={className}
-        />
-      </Suspense>
-    </SplineErrorBoundary>
-  )
+    <spline-viewer
+      url={scene}
+      className={cn("block w-full h-full", className)}
+      events-target="global"
+      loading-anim="spinner"
+    />
+  );
 }
