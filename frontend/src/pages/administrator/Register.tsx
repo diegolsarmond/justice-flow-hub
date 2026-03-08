@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import quantumLogo from "@/assets/quantum-logo.png";
 import { routes } from "@/config/routes";
 import { appConfig } from "@/config/app-config";
+import { signUpRequest, ApiError } from "@/features/auth/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -18,10 +19,11 @@ const Register = () => {
     password: "",
     confirmPassword: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -33,12 +35,42 @@ const Register = () => {
       return;
     }
 
-    // Simular cadastro
-    toast({
-      title: "Cadastro realizado!",
-      description: "Sua conta foi criada, confirme o e-mail para ter acesso ao sistema."
-    });
-    navigate(routes.login);
+    if (formData.password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres."
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await signUpRequest({
+        email: formData.email,
+        password: formData.password,
+        nome: formData.name,
+        empresa: formData.company,
+      });
+
+      toast({
+        title: "Cadastro realizado!",
+        description: result.message,
+      });
+      navigate(routes.login);
+    } catch (error) {
+      const message = error instanceof ApiError
+        ? error.message
+        : "Não foi possível criar a conta. Tente novamente.";
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +151,7 @@ const Register = () => {
                 onChange={handleInputChange}
                 placeholder="Sua senha"
                 required
+                minLength={6}
                 className="border-primary/20 focus:border-primary"
               />
             </div>
@@ -137,8 +170,12 @@ const Register = () => {
               />
             </div>
             
-            <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90">
-              Criar Conta
+            <Button
+              type="submit"
+              className="w-full bg-gradient-primary hover:opacity-90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Criando conta..." : "Criar Conta"}
             </Button>
           </form>
           
